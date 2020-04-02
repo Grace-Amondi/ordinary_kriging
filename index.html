@@ -60,7 +60,7 @@
                 </div>
                 <div class="card-content #ffcc80 orange lighten-3">
                     <div id="upload">
-                        <form>
+                        <form id="trainForm">
                             <div class="file-field input-field">
                                 <div class="btn waves-effect waves-light orange darken-1">
                                     <span class=" white-text">Upload Geojson<i
@@ -68,32 +68,32 @@
                                     <input id="train_data" type="file" onchange='uploadTrainingData(event)'>
                                 </div>
                                 <div class="file-path-wrapper">
-                                    <input class="file-path validate" id="file_name" type="text" >
+                                    <input class="file-path validate" id="filetrain_name" type="text" >
                                 </div>
                             </div>
                         </form>
 
                     </div>
                     <div id="train">
-                        <form onsubmit="trainData(event)">
+                        <form action="#" method="post" onsubmit="trainDataForm(event)" class="trainForm" >
                             <div class="input-field">
-                                <select id="variables">
+                                <select id="variables" name="copper" >
                                     <option value="" disabled selected>Choose your variable</option>
-                                    
+                                    <option value="copper">Copper</option>
                                 </select>
                                 <label>Select training variable</label>
                             </div>
                             <label>Select variogram model</label>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian" />
+                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian" checked/>
                                 <label for="test1">Gaussian</label>
                             </p>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2" />
+                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2"/>
                                 <label for="test2">Exponential</label>
                             </p>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" value="spherical"  id="test3" />
+                                <input class="with-gap" name="group1" type="radio" value="spherical"  id="test3"/>
                                 <label for="test3">Spherical</label>
 
                             </p>
@@ -122,10 +122,10 @@
                             <div class="btn waves-effect waves-light orange darken-1">
                                 <span class=" white-text">Upload Geojson<i
                                         class="material-icons right">attach_file</i></span>
-                                <input id="test_data" type="file">
+                                <input id="test_data" type="file" onchange="predictData(event)">
                             </div>
                             <div class="file-path-wrapper">
-                                <input class="file-path validate" id="file_name" type="text" >
+                                <input class="file-path validate" id="filetest_name" type="text" >
                             </div>
                         </div>
                         <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Predict and Visualize<i
