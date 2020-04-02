@@ -1,0 +1,24 @@
+body{
+    /* height: 100%; */
+    margin : 0;
+    padding: 0;
+    width:100%;
+    overflow-y: hidden;
+}
+
+#map{
+    height:90vh;
+    /* z-index: -1; */
+    
+}
+
+input[type=range]+.thumb {
+    background-color: #e6920c;
+}
+span{
+    color: black;
+}
+  
+label{
+    color: black;
+}

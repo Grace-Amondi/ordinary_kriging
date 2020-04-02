@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriging</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+
+</head>
+
+<body>
+
+  <input type="file" id="files" name="files[]" multiple />
+  <output id="list"></output>
+  
+  <script>
+    function handleFileSelect(evt) {
+      var files = evt.target.files; // FileList object
+  
+      // Loop through the FileList and render image files as thumbnails.
+      for (var i = 0, f; f = files[i]; i++) {
+  
+        // Only process image files.
+        if (!f.type.match('geojson.*')) {
+          continue;
+        }
+  
+        var reader = new FileReader();
+  
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+          return function(e) {
+            // Render thumbnail.
+            var span = document.createElement('span');
+            span.innerHTML = ['<p>', e.target.result,
+                              , escape(theFile.name), '<p/>'].join('');
+            document.getElementById('list').insertBefore(span, null);
+          };
+        })(f);
+  
+        // Read in the image file as a data URL.
+        reader.readAsDataURL(f);
+        console.log(f)
+      }
+    }
+  
+    document.getElementById('files').addEventListener('change', handleFileSelect, false);
+  </script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+
+</html>

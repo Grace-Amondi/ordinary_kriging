@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordinary Kriging</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-wrapper #fb8c00 orange darken-1 ">
+            <a href="!#" class="brand-logo "><i class="material-icons">grain</i>Ordinary Kriging</a>
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons ">menu</i></a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="badges.html">About</a></li>
+                <li><a href="collapsible.html">Github</a></li>
+                <li><a id="menu" class="waves-effect waves-light btn btn-floating #ffe0b2 orange lighten-2" onclick="$('.tap-target').tapTarget('open')"><i class="material-icons right">info</i></a>
+                </li>
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+                <li><a href="badges.html">About</a></li>
+                <li><a href="collapsible.html">Github</a></li>
+                <li><a href="mobile.html">Mobile</a></li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <!-- Page Layout here -->
+    <div class="row">
+
+        <div class="col s12 m4 l4 #ffe0b2 orange lighten-5">
+
+            <div class="card #ffcc80 orange lighten-1 ">
+                <div class="card-content black-text">
+                    <p>Ordinary Kriging is a spatial estimation method where the error variance is minimized.
+                        This error variance is called the kriging variance.
+                        It is based on the configuration of the data and on the variogram, hence is is homoescedastic .
+                    </p>
+                </div>
+                <div class="card-tabs ">
+                    <ul class="tabs tabs-fixed-width tabs-transparent ">
+                        <li class="tab"><a class="active" href="#upload">Upload</a></li>
+                        <li class="tab"><a href="#train">Train</a></li>
+                        <li class="tab"><a href="#predict">Predict</a></li>
+                        <li class="tab"><a href="#export">Export</a></li>
+                    </ul>
+                </div>
+                <div class="card-content #ffcc80 orange lighten-3">
+                    <div id="upload">
+                        <form>
+                            <div class="file-field input-field">
+                                <div class="btn waves-effect waves-light orange darken-1">
+                                    <span class=" white-text">Upload Geojson<i
+                                            class="material-icons right">attach_file</i></span>
+                                    <input id="train_data" type="file" onchange='uploadTrainingData(event)'>
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" id="file_name" type="text" >
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div id="train">
+                        <form onsubmit="trainData(event)">
+                            <div class="input-field">
+                                <select id="variables">
+                                    <option value="" disabled selected>Choose your variable</option>
+                                    
+                                </select>
+                                <label>Select training variable</label>
+                            </div>
+                            <label>Select variogram model</label>
+                            <p>
+                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian" />
+                                <label for="test1">Gaussian</label>
+                            </p>
+                            <p>
+                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2" />
+                                <label for="test2">Exponential</label>
+                            </p>
+                            <p>
+                                <input class="with-gap" name="group1" type="radio" value="spherical"  id="test3" />
+                                <label for="test3">Spherical</label>
+
+                            </p>
+                            <label>Sigma value</label>
+
+                            <p class="range-field ">
+
+                                <input name="range1" type="range" id="test9" min="0" max="100" />
+                            </p>
+
+                            <label>Alpha value</label>
+
+                            <p class="range-field">
+                                <input name="range2" type="range" id="test10" min="0" max="100" />
+                            </p>
+                            <input type="submit"  class="btn waves-effect waves-light orange darken-1 pulse" value="Train Model">
+
+                            <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Train Dataset<i
+                                    class="material-icons right">hourglass_empty</i></a> -->
+
+                        </form>
+                        <!-- <a class="btn waves-effect waves-light orange darken-1">Upload Geojson<i class="material-icons right">attach_file</i></a> -->
+                    </div>
+                    <div id="predict">
+                        <div class="file-field input-field">
+                            <div class="btn waves-effect waves-light orange darken-1">
+                                <span class=" white-text">Upload Geojson<i
+                                        class="material-icons right">attach_file</i></span>
+                                <input id="test_data" type="file">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" id="file_name" type="text" >
+                            </div>
+                        </div>
+                        <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Predict and Visualize<i
+                                class="material-icons right">bubble_chart</i></a>
+                    </div>
+                    <div id="export">
+
+                        <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Download Geojson<i
+                                class="material-icons right">get_app</i></a>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Note that "m4 l3" was added -->
+            <!-- Grey navigation panel
+  
+                This content will be:
+            3-columns-wide on large screens,
+            4-columns-wide on medium screens,
+            12-columns-wide on small screens  -->
+
+        </div>
+
+        <div class="col s12 m8 l8" id="map">
+            <a id="menu" class="waves-effect waves-light btn btn-floating"
+                onclick="$('.tap-target').tapTarget('open')"><i class="material-icons">menu</i></a>
+
+            <!-- Tap Target Structure -->
+            <div class="tap-target #ffcc80 orange lighten-3" data-activates="menu">
+                <div class="tap-target-content ">
+                    <h5>Information</h5>
+                    <p>This app was built for performing ordinary kriging. @Grace-Amondi</p>
+                </div>
+            </div>
+            <!-- <div id="map"></div> -->
+
+            <!-- Note that "m8 l9" was added -->
+            <!-- Teal page content
+  
+                This content will be:
+            9-columns-wide on large screens,
+            8-columns-wide on medium screens,
+            12-columns-wide on small screens  -->
+
+        </div>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+    <script src="https://unpkg.com/togeojson@0.16.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/leaflet-filelayer@1.2.0"></script>
+    <script src="kriging.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>
