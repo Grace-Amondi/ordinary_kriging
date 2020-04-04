@@ -11,10 +11,9 @@
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
-
-
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
@@ -26,7 +25,8 @@
             <ul class="right hide-on-med-and-down">
                 <li><a href="badges.html">About</a></li>
                 <li><a href="collapsible.html">Github</a></li>
-                <li><a id="menu" class="waves-effect waves-light btn btn-floating #ffe0b2 orange lighten-2" onclick="$('.tap-target').tapTarget('open')"><i class="material-icons right">info</i></a>
+                <li><a id="menu" class="waves-effect waves-light btn btn-floating #ffe0b2 orange lighten-2"
+                        onclick="$('.tap-target').tapTarget('open')"><i class="material-icons right">help</i></a>
                 </li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
@@ -63,37 +63,33 @@
                         <form id="uploadtrainForm">
                             <div class="file-field input-field">
                                 <div class="btn waves-effect waves-light orange darken-1">
-                                    <span class=" white-text">Upload Geojson<i
+                                    <span class=" white-text">Upload Train and Test Geojson<i
                                             class="material-icons right">attach_file</i></span>
-                                    <input id="train_data" type="file" onchange='uploadTrainingData(event)'>
+                                    <input id="train_data" type="file" accept=".geojson" onchange='uploadTrainingData(event)' multiple>
                                 </div>
                                 <div class="file-path-wrapper">
-                                    <input class="file-path validate" id="filetrain_name" type="text" >
+                                    <input class="file-path validate" id="filetrain_name" type="text">
                                 </div>
                             </div>
-                        </form>
-
-                    </div>
-                    <div id="train">
-                        <form action="#" method="post" onsubmit="trainDataForm(event)" id="trainForm" >
                             <div class="input-field">
-                                <select id="variables" name="copper" >
+                                <select id="variables" name="copper">
                                     <option value="" disabled selected>Choose your variable</option>
-                                    <option value="copper">Copper</option>
+                                    <!-- <option value="copper">Copper</option> -->
                                 </select>
                                 <label>Select training variable</label>
                             </div>
                             <label>Select variogram model</label>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian" checked/>
+                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian"
+                                    checked />
                                 <label for="test1">Gaussian</label>
                             </p>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2"/>
+                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2" />
                                 <label for="test2">Exponential</label>
                             </p>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" value="spherical"  id="test3"/>
+                                <input class="with-gap" name="group1" type="radio" value="spherical" id="test3" />
                                 <label for="test3">Spherical</label>
 
                             </p>
@@ -109,12 +105,19 @@
                             <p class="range-field">
                                 <input name="range2" type="range" id="test10" min="0" max="100" />
                             </p>
-                            <input type="submit"  class="btn waves-effect waves-light orange darken-1 pulse" value="Train Model">
+                            <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
+                                value="Train Model" onclick="uploadTrainingData(event)">
 
                             <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Train Dataset<i
                                     class="material-icons right">hourglass_empty</i></a> -->
 
                         </form>
+                        <form action="#" method="post" onsubmit="trainDataForm(event)" id="trainForm">
+                            
+                        </form>
+                    </div>
+                    <div id="train">
+                        
                         <!-- <a class="btn waves-effect waves-light orange darken-1">Upload Geojson<i class="material-icons right">attach_file</i></a> -->
                     </div>
                     <div id="predict">
@@ -125,7 +128,7 @@
                                 <input id="test_data" type="file" onchange="predictData(event)">
                             </div>
                             <div class="file-path-wrapper">
-                                <input class="file-path validate" id="filetest_name" type="text" >
+                                <input class="file-path validate" id="filetest_name" type="text">
                             </div>
                         </div>
                         <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Predict and Visualize<i
@@ -150,14 +153,16 @@
         </div>
 
         <div class="col s12 m8 l8" id="map">
-            <a id="menu" class="waves-effect waves-light btn btn-floating"
-                onclick="$('.tap-target').tapTarget('open')"><i class="material-icons">menu</i></a>
+            <a id="menu" onclick="$('.tap-target').tapTarget('open')"></a>
 
             <!-- Tap Target Structure -->
-            <div class="tap-target #ffcc80 orange lighten-3" data-activates="menu">
-                <div class="tap-target-content ">
-                    <h5>Information</h5>
-                    <p>This app was built for performing ordinary kriging. @Grace-Amondi</p>
+            <div class="tap-target #ffcc80 orange lighten-1" data-activates="menu">
+                <div class="tap-target-content "  style="text-align: right;font-weight: bolder;">
+                    <h5>It's Easy</h5>
+                    <p>Upload a train dataset and test dataset respectively in geojson format.
+                         Select the target variable for variogram modelling.
+                        Set Sigma and Alpha values, compute i.e Train, Predict, Export
+                    </p>
                 </div>
             </div>
             <!-- <div id="map"></div> -->
@@ -185,8 +190,9 @@
     <script src="https://unpkg.com/togeojson@0.16.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
     <script src="https://unpkg.com/leaflet-filelayer@1.2.0"></script>
-    <script src="kriging.js"></script>
-    <script src="app.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="/js/kriging.js"></script>
+    <script src="/js/app.js"></script>
 
 </body>
 
