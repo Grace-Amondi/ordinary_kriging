@@ -5,13 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordinary Kriging</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
         integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
         crossorigin="" />
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
     <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -23,16 +24,16 @@
             <a href="!#" class="brand-logo "><i class="material-icons">grain</i>Ordinary Kriging</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons ">menu</i></a>
             <ul class="right hide-on-med-and-down">
-                <li><a href="badges.html">About</a></li>
-                <li><a href="collapsible.html">Github</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Github</a></li>
                 <li><a id="menu" class="waves-effect waves-light btn btn-floating #ffe0b2 orange lighten-2"
                         onclick="$('.tap-target').tapTarget('open')"><i class="material-icons right">help</i></a>
                 </li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
-                <li><a href="badges.html">About</a></li>
-                <li><a href="collapsible.html">Github</a></li>
-                <li><a href="mobile.html">Mobile</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Github</a></li>
+                <li><a href="#">Mobile</a></li>
             </ul>
         </div>
     </nav>
@@ -184,13 +185,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
     <!-- Compiled and minified JavaScript -->
     <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
         integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
         crossorigin=""></script>
     <script src="https://unpkg.com/togeojson@0.16.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
     <script src="https://unpkg.com/leaflet-filelayer@1.2.0"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="/js/kriging.js"></script>
     <script src="/js/app.js"></script>
 
