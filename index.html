@@ -7,9 +7,10 @@
     <title>Ordinary Kriging</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
         integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-        crossorigin="" />
+        crossorigin="" /> -->
+<link href='https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css' rel='stylesheet' />
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -66,7 +67,7 @@
                                 <div class="btn waves-effect waves-light orange darken-1">
                                     <span class=" white-text">Upload Train and Test Geojson<i
                                             class="material-icons right">attach_file</i></span>
-                                    <input id="train_data" type="file" accept=".geojson" onchange='uploadTrainingData(event)' multiple>
+                                    <input id="train_data" type="file" accept=".geojson" multiple>
                                 </div>
                                 <div class="file-path-wrapper">
                                     <input class="file-path validate" id="filetrain_name" type="text">
@@ -107,7 +108,7 @@
                                 <input name="range2" type="range" id="test10" min="0" max="100" />
                             </p>
                             <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
-                                value="Train Model" onclick="uploadTrainingData(event)">
+                                value="Train Model">
 
                             <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Train Dataset<i
                                     class="material-icons right">hourglass_empty</i></a> -->
@@ -186,15 +187,18 @@
     <!-- Compiled and minified JavaScript -->
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.js'></script>
 
-    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    <!-- <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
         integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-        crossorigin=""></script>
+        crossorigin=""></script> -->
     <script src="https://unpkg.com/togeojson@0.16.0"></script>
+    <script src='https://unpkg.com/@turf/turf/turf.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
     <script src="https://unpkg.com/leaflet-filelayer@1.2.0"></script>
     <script src="/js/kriging.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/js/index.js"></script>
+    <!-- <script src="/js/app.js"></script> -->
 
 </body>
 

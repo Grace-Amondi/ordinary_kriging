@@ -43,15 +43,104 @@ function predict(x, y, variogram) {
 };
 var userInput = $("#uploadtrainForm").serializeArray()
 
-// upload geojson file and display on map  FORM SECTION 1
-function uploadTrainingData(event) {
-    fileRead(event)
-};
 
+// upload geojson file and display on map  FORM SECTION 1
+function uploadTrainingData() {
+    var input = document.getElementById("train_data")
+    // var input = event.target;
+    var fileData = []
+    for (var i = 0; i < input.files.length; i++) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var dataURL = event.target.result;
+            var trainingGeojson = JSON.parse(dataURL)
+            fileData.push(trainingGeojson)
+            performComputation(fileData)
+            
+
+        };
+        reader.readAsText(input.files[i]);
+
+    };
+}
+console.log(uploadTrainingData.call(performComputation))
+function performComputation(fileData) {
+    
+    if (fileData.length === 2) {
+
+        var variableOptions = Object.values(fileData[0].features[0].properties)
+        console.log(variableOptions.length)
+
+        if (typeof (variableOptions[0]) == 'number') {
+            for (let n = 0; n < variableOptions.length; n++) {
+                // initialize select field material 
+                console.log(Object.keys(fileData[0].features[0].properties)[n])
+                varOption.innerHTML += `<option value="${Object.keys(fileData[0].features[0].properties)[n]}">${Object.keys(fileData[0].features[0].properties)[n]}</option>`
+                $('select').material_select();
+            }
+
+        } else {
+            toastr.options = {
+                "closeButton": true,
+                "timeOut": 7000,
+                "positionClass": "toast-bottom-right",
+                "showMethod": 'slideDown',
+                "hideMethod": 'slideUp',
+                "closeMethod": 'slideUp',
+            }
+            toastr.error(`<p>Your Trainind Dataset does not contain any numeric variable</p>`)
+            console.log("no numeric variable")
+        }
+
+
+        // add train data to map 
+        var trainingLayer = L.geoJSON(fileData[0])
+        trainingLayer.addTo(map)
+        // fit points to map 
+        map.fitBounds(trainingLayer.getBounds());
+
+        console.log(userInput)
+        // generate variogram 
+        var model = userInput[1].value
+        var sigma2 = userInput[2].value
+        var alpha = userInput[3].value
+        var t = []
+        var x = []
+        var y = []
+        var selectedVariable = varOption.options[varOption.selectedIndex].value;
+        for (var i = 0; i < fileData[0].features.length; i++) {
+            var copper = fileData[0].features[i].properties[`${selectedVariable}`]
+            var X = fileData[0].features[i].geometry.coordinates[1]
+            var Y = fileData[0].features[i].geometry.coordinates[0]
+
+            t.push(copper)
+            x.push(X)
+            y.push(Y)
+        }
+        var trained = train(t, x, y, model, sigma2, alpha)
+
+        // predict new data 
+        var predictedVal = []
+
+        for (var i = 0; i < trained.n; i++) {
+            var xnew = fileData[1].features[i].geometry.coordinates[1]
+            var ynew = fileData[1].features[i].geometry.coordinates[0]
+            var tpredicted = predict(xnew, ynew, trained);
+            predictedVal.push(tpredicted)
+        }
+        console.log(predictedVal)
+        // return train(t, x, y, model, sigma2, alpha)
+
+    }
+}
+
+var dataInput = document.getElementById("train_data")
+dataInput.addEventListener("change", uploadTrainingData, false)
 // use of javascript file reader to access geojson file 
 function fileRead() {
     event.preventDefault()
-    var input = event.target;
+    var input = document.getElementById("train_data")
+    // var input = event.target;
     var fileData = []
     for (var i = 0; i < input.files.length; i++) {
         var reader = new FileReader();
@@ -61,78 +150,15 @@ function fileRead() {
             fileData.push(trainingGeojson)
 
 
-            if (fileData.length === 2) {
-
-                var variableOptions = Object.values(fileData[0].features[0].properties)
-                console.log(variableOptions.length)
-
-                if (typeof (variableOptions[0]) == 'number') {
-                    for (let n = 0; n < variableOptions.length; n++) {
-                        // initialize select field material 
-                        console.log(Object.keys(fileData[0].features[0].properties)[n])
-                        varOption.innerHTML += `<option value="${Object.keys(fileData[0].features[0].properties)[n]}">${Object.keys(fileData[0].features[0].properties)[n]}</option>`
-                        $('select').material_select();
-                    }
-
-                } else {
-                    toastr.options = {
-                        "closeButton": true,
-                        "timeOut": 7000,
-                        "positionClass": "toast-bottom-right",
-                        "showMethod": 'slideDown',
-                        "hideMethod": 'slideUp',
-                        "closeMethod": 'slideUp',
-                    }
-                    toastr.error(`<p>Your Trainind Dataset does not contain any numeric variable</p>`)
-                    console.log("no numeric variable")
-                }
-
-
-                // add train data to map 
-                var trainingLayer = L.geoJSON(fileData[0])
-                trainingLayer.addTo(map)
-                // fit points to map 
-                map.fitBounds(trainingLayer.getBounds());
-
-                console.log(userInput)
-                // generate variogram 
-                var model = userInput[1].value
-                var sigma2 = userInput[2].value
-                var alpha = userInput[3].value
-                var t = []
-                var x = []
-                var y = []
-                var selectedVariable = varOption.options[varOption.selectedIndex].value;
-                for (var i = 0; i < fileData[0].features.length; i++) {
-                    var copper = fileData[0].features[i].properties[`${selectedVariable}`]
-                    var X = fileData[0].features[i].geometry.coordinates[1]
-                    var Y = fileData[0].features[i].geometry.coordinates[0]
-
-                    t.push(copper)
-                    x.push(X)
-                    y.push(Y)
-                }
-                var trained = train(t, x, y, model, sigma2, alpha)
-
-                // predict new data 
-                var predictedVal = []
-
-                for (var i = 0; i < trained.n; i++) {
-                    var xnew = fileData[1].features[i].geometry.coordinates[1]
-                    var ynew = fileData[1].features[i].geometry.coordinates[0]
-                    var tpredicted = predict(xnew, ynew, trained);
-                    predictedVal.push(tpredicted)
-                }
-                console.log(predictedVal)
-                // return train(t, x, y, model, sigma2, alpha)
-
-            }
         };
         reader.readAsText(input.files[i]);
 
     }
 
 }
+
+
+
 // train uploaded geojson file generate variogram FORM SECTION 2 
 function trainDataForm(event) {
     event.preventDefault()
