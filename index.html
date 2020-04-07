@@ -5,17 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordinary Kriging</title>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
     <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
         integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
         crossorigin="" /> -->
-<link href='https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css' rel='stylesheet' />
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://raw.githubusercontent.com/bravecow/mapbox-gl-controls/master/theme.css" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
 </head>
 
 <body>
@@ -73,6 +75,15 @@
                                     <input class="file-path validate" id="filetrain_name" type="text">
                                 </div>
                             </div>
+
+                            <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Train Dataset<i
+                                    class="material-icons right">hourglass_empty</i></a> -->
+
+                        </form>
+
+                    </div>
+                    <div id="train">
+                        <form id="trainForm">
                             <div class="input-field">
                                 <select id="variables" name="copper">
                                     <option value="" disabled selected>Choose your variable</option>
@@ -82,14 +93,15 @@
                             </div>
                             <label>Select variogram model</label>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian"
-                                    checked />
-                                <label for="test1">Gaussian</label>
-                            </p>
-                            <p>
-                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2" />
+                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2" checked/>
                                 <label for="test2">Exponential</label>
                             </p>
+                            <p>
+                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian"
+                                     />
+                                <label for="test1">Gaussian</label>
+                            </p>
+                            
                             <p>
                                 <input class="with-gap" name="group1" type="radio" value="spherical" id="test3" />
                                 <label for="test3">Spherical</label>
@@ -99,42 +111,27 @@
 
                             <p class="range-field ">
 
-                                <input name="range1" type="range" id="test9" min="0" max="100" />
+                                <input name="range1" type="range" id="test9" min="0" max="10" />
                             </p>
 
                             <label>Alpha value</label>
 
                             <p class="range-field">
-                                <input name="range2" type="range" id="test10" min="0" max="100" />
+                                <input name="range2" type="range" id="test10" min="0" max="10" />
                             </p>
                             <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
                                 value="Train Model">
 
-                            <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Train Dataset<i
-                                    class="material-icons right">hourglass_empty</i></a> -->
-
                         </form>
-                        <form action="#" method="post" onsubmit="trainDataForm(event)" id="trainForm">
-                            
-                        </form>
-                    </div>
-                    <div id="train">
-                        
-                        <!-- <a class="btn waves-effect waves-light orange darken-1">Upload Geojson<i class="material-icons right">attach_file</i></a> -->
                     </div>
                     <div id="predict">
-                        <div class="file-field input-field">
-                            <div class="btn waves-effect waves-light orange darken-1">
-                                <span class=" white-text">Upload Geojson<i
-                                        class="material-icons right">attach_file</i></span>
-                                <input id="test_data" type="file" onchange="predictData(event)">
-                            </div>
-                            <div class="file-path-wrapper">
-                                <input class="file-path validate" id="filetest_name" type="text">
-                            </div>
-                        </div>
-                        <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Predict and Visualize<i
-                                class="material-icons right">bubble_chart</i></a>
+                        <form id="predictForm">
+                            <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
+                                value="Predict and Visualize"><i class="material-icons right">bubble_chart</i>
+                            <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse" id="predict_data">Predict and Visualize<i
+                                    class="material-icons right">bubble_chart</i></a> -->
+                        </form>
+
                     </div>
                     <div id="export">
 
@@ -158,24 +155,15 @@
             <a id="menu" onclick="$('.tap-target').tapTarget('open')"></a>
 
             <!-- Tap Target Structure -->
-            <div class="tap-target #ffcc80 orange lighten-1" data-activates="menu">
-                <div class="tap-target-content "  style="text-align: right;font-weight: bolder;">
+            <div class="tap-target #ffcc80 orange lighten-2" data-activates="menu">
+                <div class="tap-target-content" id="info" style="text-align: right;">
                     <h5>It's Easy</h5>
                     <p>Upload a train dataset and test dataset respectively in geojson format.
-                         Select the target variable for variogram modelling.
+                        Select the target variable for variogram modelling.
                         Set Sigma and Alpha values, compute i.e Train, Predict, Export
                     </p>
                 </div>
             </div>
-            <!-- <div id="map"></div> -->
-
-            <!-- Note that "m8 l9" was added -->
-            <!-- Teal page content
-  
-                This content will be:
-            9-columns-wide on large screens,
-            8-columns-wide on medium screens,
-            12-columns-wide on small screens  -->
 
         </div>
 
@@ -199,7 +187,6 @@
     <script src="/js/kriging.js"></script>
     <script src="/js/index.js"></script>
     <!-- <script src="/js/app.js"></script> -->
-
 </body>
 
 </html>

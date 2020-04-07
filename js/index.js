@@ -2,9 +2,11 @@ $(".button-collapse").sideNav();
 $('.tap-target').tapTarget('open');
 $('.tap-target').tapTarget('close');
 var varOption = document.getElementById("variables")
-
-// map view 
-// var map = L.map('map').setView([-1.2544011203660779, 36.74446105957031], 12);
+var predictForm = document.getElementById("predictForm")
+var performComputationForm = document.getElementById("trainForm")
+window.onload = setTimeout(function () { $('.tap-target').tapTarget('open') }, 5000)
+window.onload = setTimeout(function () { $('.tap-target').tapTarget('close') }, 10000)
+var info = document.getElementById("info")
 mapboxgl.accessToken = 'pk.eyJ1IjoiZ3JhY2VhbW9uZGkiLCJhIjoiY2poampha2g1MDQ5czNkcXplMzMycGJtYyJ9.uec448K2BkM1FADfN4YA9Q';
 var map = new mapboxgl.Map({
     container: 'map',
@@ -12,15 +14,6 @@ var map = new mapboxgl.Map({
     center: [36.74446105957031, -1.2544011203660779],
     zoom: 9
 });
-// L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-//     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-//     maxZoom: 18,
-//     id: 'mapbox/streets-v11',
-//     tileSize: 512,
-//     zoomOffset: -1,
-//     accessToken: 'pk.eyJ1IjoiZ3JhY2VhbW9uZGkiLCJhIjoiY2poampha2g1MDQ5czNkcXplMzMycGJtYyJ9.uec448K2BkM1FADfN4YA9Q'
-// }).addTo(map);
-
 
 // train incoming data 
 function train(t, x, y, model, sigma2, alpha) {
@@ -42,6 +35,7 @@ function predict(x, y, variogram) {
 
     return kriging_matrix_multiply(k, variogram.M, 1, variogram.n, 1)[0];
 };
+function handleForm(event) { event.preventDefault(); }
 
 class ordinaryKriging {
     constructor() {
@@ -65,12 +59,30 @@ class ordinaryKriging {
                             varOption.innerHTML += `<option value="${Object.keys(fileData[0].features[0].properties)[n]}">${Object.keys(fileData[0].features[0].properties)[n]}</option>`;
                             $('select').material_select();
                         }
+                        // toastr.options = {
+                        //     "closeButton": false,
+                        //     "debug": false,
+                        //     "newestOnTop": false,
+                        //     "progressBar": false,
+                        //     "positionClass": "toast-top-right",
+                        //     "preventDuplicates": false,
+                        //     "onclick": null,
+                        //     "timeOut": "10000",
+                        //     "extendedTimeOut": "1000",
+                        //     "showEasing": "swing",
+                        //     "hideEasing": "linear",
+                        //     "showMethod": "fadeIn",
+                        //     "hideMethod": "fadeOut"
+                        // };
+                        // toastr.success(`<p>Woohoo! Go ahead and train your model</p>`);
+                        $('.tap-target').tapTarget('open')
+                        info.innerHTML = `<h5>Woohoo! Go ahead and train your model</h5>`
                     }
                     else {
                         toastr.options = {
                             "closeButton": true,
                             "timeOut": 7000,
-                            "positionClass": "toast-bottom-right",
+                            "positionClass": "toast-top-right",
                             "showMethod": 'slideDown',
                             "hideMethod": 'slideUp',
                             "closeMethod": 'slideUp',
@@ -82,14 +94,14 @@ class ordinaryKriging {
 
                     // add train data to map 
                     // var trainingLayer = L.geoJSON(fileData[0]);
-                    map.addSource(`hello${i}`, {
+                    map.addSource(`train`, {
                         type: 'geojson',
                         data: fileData[0]
                     });
                     map.addLayer({
-                        'id': 'train',
+                        'id': 'point',
                         'type': 'circle',
-                        'source': `hello${i}`,
+                        'source': `train`,
                         'paint': {
                             // make circles larger as the user zooms from z12 to z22
                             'circle-radius': 9.75,
@@ -108,70 +120,144 @@ class ordinaryKriging {
                         zoom: 11,
                         speed: 0.2,
                         curve: 1,
-                        
-                      });
+
+                    });
+
                     // map.fitBounds(fileData[0].extent)
                     // trainingLayer.addTo(map);
                     // fit points to map 
                     // map.fitBounds(trainingLayer.getBounds());
-                    new ordinaryKriging().performComputation(fileData);
+                    function performComputation(fileData) {
+
+                        // var joke = new ordinaryKriging()
+                        // joke.uploadData()
+                        console.log("hello");
+                        var userInput = $("#trainForm").serializeArray();
+                        console.log(userInput);
+                        if (fileData.length === 2) {
+
+                            // generate variogram 
+                            var model = userInput[1].value;
+                            var sigma2 = userInput[2].value;
+                            var alpha = userInput[3].value;
+                            var t = [];
+                            var x = [];
+                            var y = [];
+                            var selectedVariable = varOption.options[varOption.selectedIndex].value;
+                            for (var i = 0; i < fileData[0].features.length; i++) {
+                                var variable = fileData[0].features[i].properties[`${selectedVariable}`];
+                                var X = fileData[0].features[i].geometry.coordinates[1];
+                                var Y = fileData[0].features[i].geometry.coordinates[0];
+                                t.push(variable);
+                                x.push(X);
+                                y.push(Y);
+                            }
+                            var trained = train(t, x, y, model, sigma2, alpha);
+                            console.log(trained)
+                            function predictData(trained) {
+                                // predict new data 
+                                var predictedVal = [];
+                                for (var i = 0; i < trained.n; i++) {
+                                    var xnew = fileData[1].features[i].geometry.coordinates[1];
+                                    var ynew = fileData[1].features[i].geometry.coordinates[0];
+                                    var tpredicted = predict(xnew, ynew, trained);
+                                    predictedVal.push(tpredicted);
+                                }
+
+                                var bbox = turf.bbox(fileData[1]);
+
+                                // add train data to map 
+                                // var trainingLayer = L.geoJSON(fileData[0]);
+                                map.addSource(`predict${i}`, {
+                                    type: 'geojson',
+                                    data: fileData[1]
+                                });
+                                map.addLayer({
+                                    'id': 'predict',
+                                    'type': 'circle',
+                                    'source': `predict${i}`,
+                                    'paint': {
+                                        // make circles larger as the user zooms from z12 to z22
+                                        'circle-radius': 9.75,
+                                        // color circles by ethnicity, using a match expression
+                                        // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
+                                        'circle-color': 'grey',
+                                        'circle-stroke-color': 'white',
+                                        'circle-stroke-width': 2
+                                    }
+                                });
+                                map.fitBounds(bbox)
+                                var llb = new mapboxgl.LngLatBounds([bbox[0], bbox[1]], [bbox[2], bbox[3]]);
+                                console.log(llb.getCenter())
+                                map.easeTo({
+                                    center: llb.getCenter(),
+                                    zoom: 11,
+                                    speed: 0.2,
+                                    curve: 1,
+
+                                });
+                                console.log(predictedVal);
+                            }
+                            predictForm.addEventListener('submit', handleForm);
+                            predictForm.addEventListener('submit', function () {
+                                predictData(trained)
+                                // toastr.options = {
+                                //     "closeButton": false,
+                                //     "debug": false,
+                                //     "newestOnTop": false,
+                                //     "progressBar": false,
+                                //     "positionClass": "toast-top-right",
+                                //     "preventDuplicates": false,
+                                //     "onclick": null,
+                                //     "timeOut": "10000",
+                                //     "extendedTimeOut": "1000",
+                                //     "showEasing": "swing",
+                                //     "hideEasing": "linear",
+                                //     "showMethod": "fadeIn",
+                                //     "hideMethod": "fadeOut"
+                                // };
+                                // toastr.success(`<p>Good Job. Download your predictions.</p>`);
+                                $('.tap-target').tapTarget('open')
+                                info.innerHTML = `<h5>Good Job. Download your predictions.</h5>`
+                            })
+                        }
+                    };
+                    performComputationForm.addEventListener('submit', handleForm);
+                    performComputationForm.addEventListener('submit',
+                        function () {
+                            performComputation(fileData)
+                            // toastr.options = {
+                            //     "closeButton": false,
+                            //     "debug": false,
+                            //     "newestOnTop": false,
+                            //     "progressBar": false,
+                            //     "positionClass": "toast-top-right",
+                            //     "preventDuplicates": false,
+                            //     "onclick": null,
+                            //     "timeOut": "10000",
+                            //     "extendedTimeOut": "1000",
+                            //     "showEasing": "swing",
+                            //     "hideEasing": "linear",
+                            //     "showMethod": "fadeIn",
+                            //     "hideMethod": "fadeOut"
+                            // };
+                            // toastr.success(`<p>Yey!! Model has been trained. Let's Predict</p>`);
+                            $('.tap-target').tapTarget('open')
+                            info.innerHTML = `<h5>Yey!! Model has been trained. Let's Predict</h5>`
+                        }
+                    )
+
+
                 };
 
                 reader.readAsText(input.files[i]);
             }
 
         };
-        this.performComputation = function performComputation(fileData) {
-            // var joke = new ordinaryKriging()
-            // joke.uploadData()
-            console.log("hello");
-            if (fileData.length === 2) {
-                var userInput = $("#trainForm").serializeArray();
-                console.log(userInput);
-                // generate variogram 
-                var model = userInput[1].value;
-                var sigma2 = userInput[2].value;
-                var alpha = userInput[3].value;
-                var t = [];
-                var x = [];
-                var y = [];
-                var selectedVariable = varOption.options[varOption.selectedIndex].value;
-                for (var i = 0; i < fileData[0].features.length; i++) {
-                    var copper = fileData[0].features[i].properties[`${selectedVariable}`];
-                    var X = fileData[0].features[i].geometry.coordinates[1];
-                    var Y = fileData[0].features[i].geometry.coordinates[0];
-                    t.push(copper);
-                    x.push(X);
-                    y.push(Y);
-                }
-                var trained = train(t, x, y, model, sigma2, alpha);
-                // predict new data 
-                var predictedVal = [];
-                for (var i = 0; i < trained.n; i++) {
-                    var xnew = fileData[1].features[i].geometry.coordinates[1];
-                    var ynew = fileData[1].features[i].geometry.coordinates[0];
-                    var tpredicted = predict(xnew, ynew, trained);
-                    predictedVal.push(tpredicted);
-                }
-                console.log(predictedVal);
-                // return train(t, x, y, model, sigma2, alpha)
-            }
-        };
+
     }
 }
 var ord = new ordinaryKriging()
 var dataInput = document.getElementById("train_data")
 dataInput.addEventListener("change", ord.uploadData, false)
-function handleForm(event) { event.preventDefault(); }
-
-var performComputationForm = document.getElementById("uploadtrainForm")
-performComputationForm.addEventListener("submit", function () {
-    // handleForm
-    ord.performComputation
-}, false)
-performComputationForm.addEventListener('submit', handleForm);
-
-map.on("change", function () {
-    console.log(map.getLayer('train'))
-})
 

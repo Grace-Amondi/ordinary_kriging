@@ -63,7 +63,6 @@ function uploadTrainingData() {
 
     };
 }
-console.log(uploadTrainingData.call(performComputation))
 function performComputation(fileData) {
     
     if (fileData.length === 2) {
