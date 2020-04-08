@@ -67,7 +67,7 @@
                     <div id="upload">
                         <form id="uploadtrainForm">
                             <div class="file-field input-field">
-                                <div class="btn waves-effect waves-light orange darken-1">
+                                <div class="btn waves-effect waves-light orange darken-1" id="train_data_button">
                                     <span class=" white-text">Upload Train and Test Geojson<i
                                             class="material-icons right">attach_file</i></span>
                                     <input id="train_data" type="file" accept=".geojson" multiple>
@@ -121,22 +121,13 @@
                                 <input name="range2" type="range" id="test10" min="0" max="10" />
                             </p>
                             <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
-                                value="Train Model">
+                                value="Train Model" id="train_button">
 
                         </form>
                     </div>
                     <div id="predict">
                         <form id="predictForm">
-                            <div class="file-field input-field">
-                                <div class="btn waves-effect waves-light orange darken-1">
-                                    <span class=" white-text">Upload Test Geojson<i
-                                            class="material-icons right">attach_file</i></span>
-                                    <input id="test_data" type="file" accept=".geojson" multiple>
-                                </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" id="filetest_name" type="text">
-                                </div>
-                            </div>
+                            
                             <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
                                 value="Predict and Visualize"><i class="material-icons right">bubble_chart</i>
                             <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse" id="predict_data">Predict and Visualize<i
@@ -146,7 +137,7 @@
                     </div>
                     <div id="export">
 
-                        <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Download Geojson<i
+                        <a href="" class="btn waves-effect waves-light orange darken-1 pulse" id="download_data">Download Geojson<i
                                 class="material-icons right">get_app</i></a>
                     </div>
                 </div>
@@ -196,7 +187,6 @@
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
     <script src="https://unpkg.com/leaflet-filelayer@1.2.0"></script>
     <script src="https://raw.githubusercontent.com/mapbox/mapbox-gl-layer-groups/master/index.js"></script>
-    <script src="/js/kriging.js"></script>
     <script src="/js/index.js"></script>
     <!-- <script src="/js/app.js"></script> -->
 </body>
