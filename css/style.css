@@ -6,8 +6,22 @@ body{
     overflow-y: hidden;
     background-color: #FDF2DF;
     height: 100vh;
+    font-size: 18px;
+    font-family: 'Patrick Hand', cursive;
 }
 
+p{
+    font-size: 18px;
+    font-family: 'Patrick Hand', cursive; 
+}
+a {
+    font-size: 18px;
+    font-family: 'Patrick Hand', cursive;
+}
+li {
+    font-size: 18px;
+    font-family: 'Patrick Hand', cursive;
+}
 #map{
     height:92vh;
     /* z-index: -1; */

@@ -23,7 +23,7 @@ var info = document.getElementById("info")
 mapboxgl.accessToken = 'pk.eyJ1IjoiZ3JhY2VhbW9uZGkiLCJhIjoiY2poampha2g1MDQ5czNkcXplMzMycGJtYyJ9.uec448K2BkM1FADfN4YA9Q';
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/graceamondi/ck8ozxtnl0bjl1ipeqzib7nvj',
+    style: 'mapbox://styles/graceamondi/ck1p6wqfs0vj81cqwbikdv87j',
     center: [36.74446105957031, -1.2544011203660779],
     // zoom: 12
 });
@@ -69,17 +69,17 @@ function uploadBothData() {
         })
 
         $('.tap-target').tapTarget('open')
-        info.innerHTML = `<h5>Woohoo! Go ahead and train your model</h5>`
+        info.innerHTML = `<h5 style="font-family: 'Patrick Hand', cursive;">Woohoo! Go ahead and train your model</h5>`
     } else {
         toastr.options = {
-            "closeButton": true,
+            "closeButton": false,
             "timeOut": 7000,
             "positionClass": "toast-top-right",
             "showMethod": 'slideDown',
             "hideMethod": 'slideUp',
             "closeMethod": 'slideUp',
         };
-        toastr.error(`<p>Woiyee.. We need a training and testing data respectively</p>`);
+        toastr.error(`<p style="font-family: 'Patrick Hand', cursive;">Woiyee.. We need a training and testing data respectively</p>`);
     }
 
 
@@ -103,14 +103,14 @@ function addTrainToMap(fileData) {
     }
     else {
         toastr.options = {
-            "closeButton": true,
+            "closeButton": false,
             "timeOut": 7000,
             "positionClass": "toast-top-right",
             "showMethod": 'slideDown',
             "hideMethod": 'slideUp',
             "closeMethod": 'slideUp',
         };
-        toastr.error(`<p>Your Trainind Dataset does not contain any numeric variable</p>`);
+        toastr.error(`<p  style="font-family: 'Patrick Hand', cursive;">Your Trainind Dataset does not contain any numeric variable</p>`);
         console.log("no numeric variable");
     }
     // get bounding box for train data 
@@ -186,7 +186,7 @@ function addTrainToMap(fileData) {
             performTraining(fileData)
 
             $('.tap-target').tapTarget('open')
-            info.innerHTML = `<h5>Yey!! Model has been trained. Let's Predict</h5>`
+            info.innerHTML = `<h5  style="font-family: 'Patrick Hand', cursive;">Yey!! Model has been trained. Let's Predict</h5>`
         }
     )
 }
@@ -218,19 +218,19 @@ function performTraining(fileData) {
             performPrediction(trained, fileData, selectedVariable)
 
             $('.tap-target').tapTarget('open')
-            info.innerHTML = `<h5>Good Job. Download your predictions.</h5>`
+            info.innerHTML = `<h5  style="font-family: 'Patrick Hand', cursive;">Good Job. Download your predictions.</h5>`
         })
 
     } else {
         toastr.options = {
-            "closeButton": true,
+            "closeButton": false,
             "timeOut": 7000,
             "positionClass": "toast-top-right",
             "showMethod": 'slideDown',
             "hideMethod": 'slideUp',
             "closeMethod": 'slideUp',
         };
-        toastr.error(`<p>Woiyee.. You forgot to provide two datasets </p>`);
+        toastr.error(`<p style="font-family: 'Patrick Hand', cursive;">You forgot to provide two datasets </p>`);
     }
 };
 
