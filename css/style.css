@@ -37,6 +37,7 @@ span{
   
 label{
     color: black;
+    font-size: 18px;
 }
 .mapboxgl-popup {
     max-width: 400px;
