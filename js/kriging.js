@@ -351,11 +351,13 @@ var kriging = function () {
 	// Model prediction
 	kriging.predict = function (x, y, variogram) {
 		var i, k = Array(variogram.n);
-		for (i = 0; i < variogram.n.length; i++)
+		for (i = 0; i < variogram.n; i++) {
 			k[i] = variogram.model(Math.pow(Math.pow(x - variogram.x[i], 2) +
 				Math.pow(y - variogram.y[i], 2), 0.5),
 				variogram.nugget, variogram.range,
 				variogram.sill, variogram.A);
+		}
+
 		return kriging_matrix_multiply(k, variogram.M, 1, variogram.n, 1)[0];
 	};
 	kriging.variance = function (x, y, variogram) {
@@ -475,3 +477,5 @@ var kriging = function () {
 
 	return kriging;
 }();
+
+module.exports.kriging = kriging

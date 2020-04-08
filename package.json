@@ -2,7 +2,7 @@
   "name": "kriging",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "/js/index.js",
   "scripts": {
     "start": "parcel index.html",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,6 +21,9 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "lodash.assign": "^4.2.0",
+    "mapbox-gl": "^1.9.1",
     "mapbox-gl-controls": "^1.6.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",

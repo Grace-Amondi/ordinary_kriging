@@ -1,12 +1,20 @@
+import RulerControl from 'mapbox-gl-controls/lib/ruler';
+import CompassControl from 'mapbox-gl-controls/lib/compass';
+import ZoomControl from 'mapbox-gl-controls/lib/zoom';
+import AroundControl from 'mapbox-gl-controls/lib/around'
+import kriging from './kriging'
+import fs from 'fs'
+// var kriging = require("./kriging")
 $(".button-collapse").sideNav();
-$('.tap-target').tapTarget('open');
-$('.tap-target').tapTarget('close');
+
 var varOption = document.getElementById("variables")
 var predictForm = document.getElementById("predictForm")
 var performComputationForm = document.getElementById("trainForm")
 window.onload = setTimeout(function () { $('.tap-target').tapTarget('open') }, 5000)
 window.onload = setTimeout(function () { $('.tap-target').tapTarget('close') }, 10000)
 var info = document.getElementById("info")
+
+// map container 
 mapboxgl.accessToken = 'pk.eyJ1IjoiZ3JhY2VhbW9uZGkiLCJhIjoiY2poampha2g1MDQ5czNkcXplMzMycGJtYyJ9.uec448K2BkM1FADfN4YA9Q';
 var map = new mapboxgl.Map({
     container: 'map',
@@ -14,171 +22,21 @@ var map = new mapboxgl.Map({
     center: [36.74446105957031, -1.2544011203660779],
     zoom: 9
 });
-var kriging = {};
-// Train using gaussian processes with bayesian priors
-kriging.train = function (t, x, y, model, sigma2, alpha) {
-    var variogram = {
-        t: t,
-        x: x,
-        y: y,
-        nugget: 0.0,
-        range: 0.0,
-        sill: 0.0,
-        A: 1 / 3,
-        n: 0
-    };
-    switch (model) {
-        case "gaussian":
-            variogram.model = kriging_variogram_gaussian;
-            break;
-        case "exponential":
-            variogram.model = kriging_variogram_exponential;
-            break;
-        case "spherical":
-            variogram.model = kriging_variogram_spherical;
-            break;
-    };
 
-    // Lag distance/semivariance
-    var i, j, k, l, n = t.length;
-    var distance = Array((n * n - n) / 2);
-    for (i = 0, k = 0; i < n; i++)
-        for (j = 0; j < i; j++, k++) {
-            distance[k] = Array(2);
-            distance[k][0] = Math.pow(
-                Math.pow(x[i] - x[j], 2) +
-                Math.pow(y[i] - y[j], 2), 0.5);
-            distance[k][1] = Math.abs(t[i] - t[j]);
-        }
-    distance.sort(function (a, b) { return a[0] - b[0]; });
-    variogram.range = distance[(n * n - n) / 2 - 1][0];
-
-    // Bin lag distance
-    var lags = ((n * n - n) / 2) > 30 ? 30 : (n * n - n) / 2;
-    var tolerance = variogram.range / lags;
-    var lag = [0].rep(lags);
-    var semi = [0].rep(lags);
-    if (lags < 30) {
-        for (l = 0; l < lags; l++) {
-            lag[l] = distance[l][0];
-            semi[l] = distance[l][1];
-        }
-    }
-    else {
-        for (i = 0, j = 0, k = 0, l = 0; i < lags && j < ((n * n - n) / 2); i++, k = 0) {
-            while (distance[j][0] <= ((i + 1) * tolerance)) {
-                lag[l] += distance[j][0];
-                semi[l] += distance[j][1];
-                j++; k++;
-                if (j >= ((n * n - n) / 2)) break;
-            }
-            if (k > 0) {
-                lag[l] /= k;
-                semi[l] /= k;
-                l++;
-            }
-        }
-        if (l < 2) return variogram; // Error: Not enough points
-    }
-
-    // Feature transformation
-    n = l;
-    variogram.range = lag[n - 1] - lag[0];
-    var X = [1].rep(2 * n);
-    var Y = Array(n);
-    var A = variogram.A;
-    for (i = 0; i < n; i++) {
-        switch (model) {
-            case "gaussian":
-                X[i * 2 + 1] = 1.0 - Math.exp(-(1.0 / A) * Math.pow(lag[i] / variogram.range, 2));
-                break;
-            case "exponential":
-                X[i * 2 + 1] = 1.0 - Math.exp(-(1.0 / A) * lag[i] / variogram.range);
-                break;
-            case "spherical":
-                X[i * 2 + 1] = 1.5 * (lag[i] / variogram.range) -
-                    0.5 * Math.pow(lag[i] / variogram.range, 3);
-                break;
-        };
-        Y[i] = semi[i];
-    }
-
-    // Least squares
-    var Xt = kriging_matrix_transpose(X, n, 2);
-    var Z = kriging_matrix_multiply(Xt, X, 2, n, 2);
-    Z = kriging_matrix_add(Z, kriging_matrix_diag(1 / alpha, 2), 2, 2);
-    var cloneZ = Z.slice(0);
-    if (kriging_matrix_chol(Z, 2))
-        kriging_matrix_chol2inv(Z, 2);
-    else {
-        kriging_matrix_solve(cloneZ, 2);
-        Z = cloneZ;
-    }
-    var W = kriging_matrix_multiply(kriging_matrix_multiply(Z, Xt, 2, 2, n), Y, 2, n, 1);
-
-    // Variogram parameters
-    variogram.nugget = W[0];
-    variogram.sill = W[1] * variogram.range + variogram.nugget;
-    variogram.n = x.length;
-
-    // Gram matrix with prior
-    n = x.length;
-    var K = Array(n * n);
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < i; j++) {
-            K[i * n + j] = variogram.model(Math.pow(Math.pow(x[i] - x[j], 2) +
-                Math.pow(y[i] - y[j], 2), 0.5),
-                variogram.nugget,
-                variogram.range,
-                variogram.sill,
-                variogram.A);
-            K[j * n + i] = K[i * n + j];
-        }
-        K[i * n + i] = variogram.model(0, variogram.nugget,
-            variogram.range,
-            variogram.sill,
-            variogram.A);
-    }
-
-    // Inverse penalized Gram matrix projected to target vector
-    var C = kriging_matrix_add(K, kriging_matrix_diag(sigma2, n), n, n);
-    var cloneC = C.slice(0);
-    if (kriging_matrix_chol(C, n))
-        kriging_matrix_chol2inv(C, n);
-    else {
-        kriging_matrix_solve(cloneC, n);
-        C = cloneC;
-    }
-
-    // Copy unprojected inverted matrix as K
-    var K = C.slice(0);
-    var M = kriging_matrix_multiply(C, t, n, n, 1);
-    variogram.K = K;
-    variogram.M = M;
-
-    return variogram;
-};
+// map controls 
+map.addControl(new ZoomControl(), 'top-left');
+map.addControl(new RulerControl(), 'top-left');
+map.addControl(new AroundControl(), 'top-left')
+map.addControl(new CompassControl(), 'top-left');
 
 // train incoming data 
 function train(t, x, y, model, sigma2, alpha) {
 
-    var variogram = kriging.train(t, x, y, model, sigma2, alpha);
+    var variogram = kriging.kriging.train(t, x, y, model, sigma2, alpha);
 
     return variogram
 }
 
-// predict variables for new coordinates 
-function predict(x, y, variogram) {
-    var i, k = Array(variogram.n);
-    for (i = 0; i < variogram.n; i++) {
-        k[i] = variogram.model(Math.pow(Math.pow(x - variogram.x[i], 2) +
-            Math.pow(y - variogram.y[i], 2), 0.5),
-            variogram.nugget, variogram.range,
-            variogram.sill, variogram.A);
-    }
-
-    return kriging_matrix_multiply(k, variogram.M, 1, variogram.n, 1)[0];
-};
 function handleForm(event) { event.preventDefault(); }
 
 class ordinaryKriging {
@@ -193,6 +51,7 @@ class ordinaryKriging {
                 reader.onload = function () {
                     var dataURL = event.target.result;
                     var trainingGeojson = JSON.parse(dataURL);
+                    processFile(trainingGeojson);
                     fileData.push(trainingGeojson);
                     var variableOptions = Object.values(fileData[0].features[0].properties);
                     console.log(variableOptions.length);
@@ -203,22 +62,7 @@ class ordinaryKriging {
                             varOption.innerHTML += `<option value="${Object.keys(fileData[0].features[0].properties)[n]}">${Object.keys(fileData[0].features[0].properties)[n]}</option>`;
                             $('select').material_select();
                         }
-                        // toastr.options = {
-                        //     "closeButton": false,
-                        //     "debug": false,
-                        //     "newestOnTop": false,
-                        //     "progressBar": false,
-                        //     "positionClass": "toast-top-right",
-                        //     "preventDuplicates": false,
-                        //     "onclick": null,
-                        //     "timeOut": "10000",
-                        //     "extendedTimeOut": "1000",
-                        //     "showEasing": "swing",
-                        //     "hideEasing": "linear",
-                        //     "showMethod": "fadeIn",
-                        //     "hideMethod": "fadeOut"
-                        // };
-                        // toastr.success(`<p>Woohoo! Go ahead and train your model</p>`);
+
                         $('.tap-target').tapTarget('open')
                         info.innerHTML = `<h5>Woohoo! Go ahead and train your model</h5>`
                     }
@@ -238,14 +82,14 @@ class ordinaryKriging {
 
                     // add train data to map 
                     // var trainingLayer = L.geoJSON(fileData[0]);
-                    map.addSource(`train`, {
+                    map.addSource('places', {
                         type: 'geojson',
                         data: fileData[0]
                     });
                     map.addLayer({
-                        'id': 'point',
+                        'id': 'places',
                         'type': 'circle',
-                        'source': `train`,
+                        'source': 'places',
                         'paint': {
                             // make circles larger as the user zooms from z12 to z22
                             'circle-radius': 9.75,
@@ -265,6 +109,40 @@ class ordinaryKriging {
                         speed: 0.2,
                         curve: 1,
 
+                    });
+                    // When a click event occurs on a feature in the places layer, open a popup at the
+                    // location of the feature, with description HTML from its properties.
+                    var description = []
+                    map.on('click', 'places', function (e) {
+                        for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
+                            var coordinates = e.features[0].geometry.coordinates.slice();
+                            description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}`;
+                            console.log(description)
+
+                            // Ensure that if the map is zoomed out such that multiple
+                            // copies of the feature are visible, the popup appears
+                            // over the copy being pointed to.
+                            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                            }
+
+                        }
+
+                        new mapboxgl.Popup()
+                            .setLngLat(coordinates)
+                            .setHTML(description)
+                            .addTo(map);
+
+                    });
+
+                    // Change the cursor to a pointer when the mouse is over the places layer.
+                    map.on('mouseenter', 'places', function () {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    // Change it back to a pointer when it leaves.
+                    map.on('mouseleave', 'places', function () {
+                        map.getCanvas().style.cursor = '';
                     });
 
                     // map.fitBounds(fileData[0].extent)
@@ -304,7 +182,7 @@ class ordinaryKriging {
                                 for (var i = 0; i < trained.n; i++) {
                                     var xnew = fileData[1].features[i].geometry.coordinates[1];
                                     var ynew = fileData[1].features[i].geometry.coordinates[0];
-                                    var tpredicted = predict(xnew, ynew, trained);
+                                    var tpredicted = kriging.kriging.predict(xnew, ynew, trained);
                                     predictedVal.push(tpredicted);
                                 }
 
@@ -341,26 +219,12 @@ class ordinaryKriging {
 
                                 });
                                 console.log(predictedVal);
+
                             }
                             predictForm.addEventListener('submit', handleForm);
                             predictForm.addEventListener('submit', function () {
                                 predictData(trained)
-                                // toastr.options = {
-                                //     "closeButton": false,
-                                //     "debug": false,
-                                //     "newestOnTop": false,
-                                //     "progressBar": false,
-                                //     "positionClass": "toast-top-right",
-                                //     "preventDuplicates": false,
-                                //     "onclick": null,
-                                //     "timeOut": "10000",
-                                //     "extendedTimeOut": "1000",
-                                //     "showEasing": "swing",
-                                //     "hideEasing": "linear",
-                                //     "showMethod": "fadeIn",
-                                //     "hideMethod": "fadeOut"
-                                // };
-                                // toastr.success(`<p>Good Job. Download your predictions.</p>`);
+
                                 $('.tap-target').tapTarget('open')
                                 info.innerHTML = `<h5>Good Job. Download your predictions.</h5>`
                             })
@@ -404,4 +268,6 @@ class ordinaryKriging {
 var ord = new ordinaryKriging()
 var dataInput = document.getElementById("train_data")
 dataInput.addEventListener("change", ord.uploadData, false)
-
+function processFile(content) {
+    console.log(content);
+}

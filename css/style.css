@@ -2,9 +2,10 @@ body{
     /* height: 100%; */
     margin : 0;
     padding: 0;
-    width:100%;
+    width:100vw;
     overflow-y: hidden;
     background-color: #FDF2DF;
+    height: 100vh;
 }
 
 #map{
@@ -23,3 +24,7 @@ span{
 label{
     color: black;
 }
+.mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }

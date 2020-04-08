@@ -13,9 +13,10 @@
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://raw.githubusercontent.com/bravecow/mapbox-gl-controls/master/theme.css" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/style.css">
+    <link href="https://raw.githubusercontent.com/bravecow/mapbox-gl-controls/master/theme.css" rel="stylesheet">
+
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 </head>
@@ -93,15 +94,15 @@
                             </div>
                             <label>Select variogram model</label>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2" checked/>
+                                <input class="with-gap" name="group1" type="radio" value="exponential" id="test2"
+                                    checked />
                                 <label for="test2">Exponential</label>
                             </p>
                             <p>
-                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian"
-                                     />
+                                <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian" />
                                 <label for="test1">Gaussian</label>
                             </p>
-                            
+
                             <p>
                                 <input class="with-gap" name="group1" type="radio" value="spherical" id="test3" />
                                 <label for="test3">Spherical</label>
@@ -126,6 +127,16 @@
                     </div>
                     <div id="predict">
                         <form id="predictForm">
+                            <div class="file-field input-field">
+                                <div class="btn waves-effect waves-light orange darken-1">
+                                    <span class=" white-text">Upload Test Geojson<i
+                                            class="material-icons right">attach_file</i></span>
+                                    <input id="test_data" type="file" accept=".geojson" multiple>
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" id="filetest_name" type="text">
+                                </div>
+                            </div>
                             <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
                                 value="Predict and Visualize"><i class="material-icons right">bubble_chart</i>
                             <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse" id="predict_data">Predict and Visualize<i
@@ -184,6 +195,7 @@
     <script src='https://unpkg.com/@turf/turf/turf.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
     <script src="https://unpkg.com/leaflet-filelayer@1.2.0"></script>
+    <script src="https://raw.githubusercontent.com/mapbox/mapbox-gl-layer-groups/master/index.js"></script>
     <script src="/js/kriging.js"></script>
     <script src="/js/index.js"></script>
     <!-- <script src="/js/app.js"></script> -->
