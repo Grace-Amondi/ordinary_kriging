@@ -1,4 +1,7 @@
 # Ordinary Kriging
+
+![Application](https://github.com/Grace-Amondi/ordinary_kriging/blob/master/images/home.png "Application Demo")
+
 Geostatistical Prediction with ordinary kriging 
 Ordinary Kriging is a spatial estimation method where the error variance is minimized. 
 This error variance is called the kriging variance. It is based on the configuration of the data and on the variogram. For example, say we are studying copper concentration in soil,
