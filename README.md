@@ -32,9 +32,9 @@ Open application at http://localhost:1234
 
 ---
 
-## Build for development
+## Build for production
 
-To build the app for development,
+To build the app for production,
 
 ```npm run build```
 
@@ -68,7 +68,8 @@ files (or raw data buffers) stored on the user's computer, using File or Blob ob
 in reading of training and test geojson data.
 
 ### FileSaver
-FileSaver enables saving files on the client-side which is exactly what it was used for in this application. With the saveAs() 
+
+[FileSaver](https://github.com/eligrey/FileSaver.js/ "filesaver") enables saving files on the client-side which is exactly what it was used for in this application. With the saveAs() 
 function you are good to go.
 
 ### Parcel
