@@ -9,38 +9,103 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <!-- <link rel="stylesheet" href="/css/style.css"> -->
 
 
 </head>
 
 <body>
+    <style>
+        .parallax-container {
+            height: 400px;
+            /* width: 100%; */
 
-    <nav>
-        <div class="nav-wrapper #fb8c00 orange darken-1 ">
-            <a href="index.html" class="brand-logo "><i class="material-icons">grain</i>Ordinary Kriging</a>
-            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons ">menu</i></a>
-            <ul class="right hide-on-med-and-down">
-                <li><a href="/about.html" style="font-size: 18px;font-family: 'Patrick Hand', cursive;">About</a></li>
-                <li><a href="#" style="font-size: 18px;font-family: 'Patrick Hand', cursive;">Github</a></li>
-                <li><a id="menu" class="waves-effect waves-light btn btn-floating #ffe0b2 orange lighten-2"
-                        onclick="$('.tap-target').tapTarget('open')"><i class="material-icons right">help</i></a>
-                </li>
-            </ul>
-            <ul class="side-nav" id="mobile-demo">
-                <li><a href="#">About</a></li>
-                <li><a href="#">Github</a></li>
-                <li><a href="#">Mobile</a></li>
-            </ul>
+        }
+    </style>
+    <header>
+        <div class="navbar-fixed">
+            <nav>
+                <div class="nav-wrapper #fb8c00 orange darken-1 ">
+                    <a href="index.html" class="brand-logo "><i class="material-icons">grain</i>Ordinary Kriging</a>
+                    <a href="#" data-activates="mobile-demo" class="button-collapse"><i
+                            class="material-icons ">menu</i></a>
+                    <ul class="right hide-on-med-and-down">
+                        <li><a href="/about.html"
+                                style="font-size: 18px;font-family: 'Patrick Hand', cursive;">About</a>
+                        </li>
+                        <li><a href="#" style="font-size: 18px;font-family: 'Patrick Hand', cursive;">Github</a></li>
+                        <li><a id="menu" class="waves-effect waves-light btn btn-floating #ffe0b2 orange lighten-2"
+                                onclick="$('.tap-target').tapTarget('open')"><i
+                                    class="material-icons right">help</i></a>
+                        </li>
+                    </ul>
+                    <ul class="side-nav" id="mobile-demo">
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Github</a></li>
+                        <li><a href="#">Mobile</a></li>
+                    </ul>
+                </div>
+            </nav>
         </div>
-    </nav>
 
+    </header>
+    <main>
+        <!-- <section>
+            <h3>Ordinary Kriging</h3>
+        </section> -->
+        <section>
+            <div class="row">
+                <div class="col m9">
+                    <div class="card z-depth-3">
+                        <div class="card-image">
+                            <video class="responsive-video" controls autoplay>
+                                <source src="/images/demo.webm" type="video/mp4">
+                            </video>
+                            <span class="card-title black-text">Application Demo</span>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col m3">
+                    <ul class="collapsible popout" data-collapsible="accordion">
+                        <li class="active">
+                            <div class="collapsible-header active"><i class="material-icons">file_upload</i>Step 1</div>
+                            <div class="collapsible-body" style="display: block;"><span>Upload training dataset in
+                                    geojson
+                                    format. Ensure that your training data contains numeric attributes for training
+                                </span></div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">bubble_chart</i>Step 2</div>
+                            <div class="collapsible-body"><span>Specify the training attribute, sigma value, gamma value
+                                    and variogram
+                                    model. Train the model.
+                                </span></div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">show_chart</i>Step 3</div>
+                            <div class="collapsible-body"><span>Upload Test data in geojson format and predict
+                                    values.</span></div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">file_download</i>Step 4</div>
+                            <div class="collapsible-body"><span>Download the predicted data.</span></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
+
+
+    </main>
 
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-
+    <script src="/js/about.js"></script>
 </body>
 
 </html>

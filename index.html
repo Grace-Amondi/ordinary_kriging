@@ -72,7 +72,7 @@
                                     <div class="btn waves-effect waves-light orange darken-1" id="train_data_button">
                                         <span class=" white-text">Upload Training Geojson<i
                                                 class="material-icons right">attach_file</i></span>
-                                        <input id="train_data" type="file" accept=".geojson" multiple>
+                                        <input id="train_data" type="file" accept=".geojson">
                                     </div>
                                     <div class="file-path-wrapper">
                                         <input class="file-path validate" id="filetrain_name" type="text">
@@ -161,7 +161,7 @@
                 12-columns-wide on small screens  -->
     
             </div>
-    
+            <div id="layergroup"></div>
             <div class="col s12 m8 l8" id="map">
                 <a id="menu" onclick="$('.tap-target').tapTarget('open')"></a>
     

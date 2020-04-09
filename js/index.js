@@ -92,14 +92,14 @@ function addTrainToMap(trainingGeojson) {
         $('.tap-target').tapTarget('open')
         info.innerHTML = `<h5 style="font-family: 'Patrick Hand', cursive;">Woohoo! Go ahead and train your model</h5>`
         // add training geojson data to map 
-        map.addSource('places', {
+        map.addSource('Train Layer', {
             type: 'geojson',
             data: trainingGeojson
         });
         map.addLayer({
-            'id': 'places',
+            'id': 'Train Layer',
             'type': 'circle',
-            'source': 'places',
+            'source': 'Train Layer',
             'paint': {
                 // make circles larger as the user zooms from z12 to z22
                 'circle-radius': 9.75,
@@ -119,11 +119,37 @@ function addTrainToMap(trainingGeojson) {
             padding: 20,
             linear: false
         });
+        var toggleableLayerIds = 'Train Layer'
 
-        // When a click event occurs on a feature in the places layer, open a popup at the
+        var link = document.createElement('a');
+        link.href = '#';
+        link.className = 'active';
+        link.innerHTML = `&#10004;`;
+        link.textContent +=`${toggleableLayerIds}` ;
+
+        link.onclick = function (e) {
+            var clickedLayer = toggleableLayerIds;
+            e.preventDefault();
+            e.stopPropagation();
+
+            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+            if (visibility === 'visible') {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                this.className = '';
+            } else {
+                this.className = 'active';
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            }
+        };
+
+        var layers = document.getElementById('layergroup');
+        layers.appendChild(link);
+
+        // When a click event occurs on a feature in the Train Layer layer, open a popup at the
         // location of the feature, with description HTML from its properties.
         var description = []
-        map.on('click', 'places', function (e) {
+        map.on('click', 'Train Layer', function (e) {
             for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
                 var coordinates = e.features[0].geometry.coordinates.slice();
                 description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}`;
@@ -143,13 +169,13 @@ function addTrainToMap(trainingGeojson) {
 
         });
 
-        // Change the cursor to a pointer when the mouse is over the places layer.
-        map.on('mouseenter', 'places', function () {
+        // Change the cursor to a pointer when the mouse is over the Train layer.
+        map.on('mouseenter', 'Train Layer', function () {
             map.getCanvas().style.cursor = 'pointer';
         });
 
         // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'places', function () {
+        map.on('mouseleave', 'Train Layer', function () {
             map.getCanvas().style.cursor = 'default';
         });
 
@@ -244,14 +270,14 @@ function performPrediction(testingGeojson, variogram, selectedVariable) {
     console.log(predctions)
     var collection = turf.featureCollection(predctions);
     // add test data to map 
-    map.addSource(`predict`, {
+    map.addSource(`Predicted Layer`, {
         type: 'geojson',
         data: collection
     });
     map.addLayer({
-        'id': 'predict',
+        'id': 'Predicted Layer',
         'type': 'circle',
-        'source': `predict`,
+        'source': `Predicted Layer`,
         'paint': {
             // make circles larger as the user zooms from z12 to z22
             'circle-radius': 9.75,
@@ -262,6 +288,34 @@ function performPrediction(testingGeojson, variogram, selectedVariable) {
             'circle-stroke-width': 2
         }
     });
+    var toggleableLayerIds = 'Predicted Layer'
+
+        var link = document.createElement('a');
+        link.href = '#';
+        link.className = 'active';
+        link.innerHTML = `&#10004;`;
+        link.textContent +=`${toggleableLayerIds}` ;
+
+
+        link.onclick = function (e) {
+            var clickedLayer = toggleableLayerIds;
+            e.preventDefault();
+            e.stopPropagation();
+
+            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+            if (visibility === 'visible') {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                this.className = '';
+            } else {
+                this.className = 'active';
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            }
+        };
+
+        var layers = document.getElementById('layergroup');
+        layers.appendChild(link);
+
     var bounds = new mapboxgl.LngLatBounds();
 
     testingGeojson.features.forEach(function (feature) {
@@ -273,18 +327,18 @@ function performPrediction(testingGeojson, variogram, selectedVariable) {
         linear: false
     });
 
-    // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'predict', function () {
+    // Change the cursor to a pointer when the mouse is over the Train layer.
+    map.on('mouseenter', 'Predicted Layer', function () {
         map.getCanvas().style.cursor = 'pointer';
     });
 
     // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'predict', function () {
+    map.on('mouseleave', 'Predicted Layer', function () {
         map.getCanvas().style.cursor = 'default';
     });
 
     var description = []
-    map.on('click', 'predict', function (e) {
+    map.on('click', 'Predicted Layer', function (e) {
         for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
             var coordinates = e.features[0].geometry.coordinates.slice();
             description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}`;
@@ -318,3 +372,4 @@ function downloadPredictions(content, filename) {
         type: "text/plain;charset=utf-8"
     }), file);
 }
+
