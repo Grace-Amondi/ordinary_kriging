@@ -23,7 +23,8 @@ var performTrainingForm = document.getElementById("trainForm")
 var dataInput = document.getElementById("train_data")
 var downloadButton = document.getElementById("download_data")
 var dataButton = document.getElementById("train_data_button")
-var testButton = document.getElementById("test_data")
+var testButtonInput = document.getElementById("test_data")
+var testButton = document.getElementById("test_data_button")
 // // welcome popup 
 var info = document.getElementById("info")
 
@@ -65,13 +66,8 @@ function uploadBothData() {
     };
 
     reader.readAsText(input.files[0]);
-    dataButton.classList.add('disabled')
-    dataButton.addEventListener('mouseenter', function () {
-        dataButton.style.cursor = 'not-allowed'
-    })
 
-    $('.tap-target').tapTarget('open')
-    info.innerHTML = `<h5 style="font-family: 'Patrick Hand', cursive;">Woohoo! Go ahead and train your model</h5>`
+
 
 }
 
@@ -89,7 +85,76 @@ function addTrainToMap(trainingGeojson) {
             varOption.innerHTML += `<option value="${Object.keys(trainingGeojson.features[0].properties)[n]}">${Object.keys(trainingGeojson.features[0].properties)[n]}</option>`;
             $('select').material_select();
         }
+        dataButton.classList.add('disabled')
+        dataButton.addEventListener('mouseenter', function () {
+            dataButton.style.cursor = 'not-allowed'
+        })
+        $('.tap-target').tapTarget('open')
+        info.innerHTML = `<h5 style="font-family: 'Patrick Hand', cursive;">Woohoo! Go ahead and train your model</h5>`
+        // add training geojson data to map 
+        map.addSource('places', {
+            type: 'geojson',
+            data: trainingGeojson
+        });
+        map.addLayer({
+            'id': 'places',
+            'type': 'circle',
+            'source': 'places',
+            'paint': {
+                // make circles larger as the user zooms from z12 to z22
+                'circle-radius': 9.75,
+                // color circles by ethnicity, using a match expression
+                // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
+                'circle-color': 'orange',
+                'circle-stroke-color': 'white',
+                'circle-stroke-width': 2
+            }
+        });
+
+        trainingGeojson.features.forEach(function (feature) {
+            bounds.extend(feature.geometry.coordinates);
+        });
+
+        map.fitBounds(bounds, {
+            padding: 20,
+            linear: false
+        });
+
+        // When a click event occurs on a feature in the places layer, open a popup at the
+        // location of the feature, with description HTML from its properties.
+        var description = []
+        map.on('click', 'places', function (e) {
+            for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
+                var coordinates = e.features[0].geometry.coordinates.slice();
+                description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}`;
+                // Ensure that if the map is zoomed out such that multiple
+                // copies of the feature are visible, the popup appears
+                // over the copy being pointed to.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+
+            }
+
+            new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+
+        });
+
+        // Change the cursor to a pointer when the mouse is over the places layer.
+        map.on('mouseenter', 'places', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'places', function () {
+            map.getCanvas().style.cursor = 'default';
+        });
+
     }
+
     else {
         toastr.options = {
             "closeButton": false,
@@ -99,71 +164,10 @@ function addTrainToMap(trainingGeojson) {
             "hideMethod": 'slideUp',
             "closeMethod": 'slideUp',
         };
-        toastr.error(`<p  style="font-family: 'Patrick Hand', cursive;">Your Trainind Dataset does not contain any numeric variable</p>`);
+        toastr.error(`<p  style="font-family: 'Patrick Hand', cursive;">Your Trainind Dataset does not contain any numeric variable.Try Another</p>`);
         console.log("no numeric variable");
     }
 
-    // add training geojson data to map 
-    map.addSource('places', {
-        type: 'geojson',
-        data: trainingGeojson
-    });
-    map.addLayer({
-        'id': 'places',
-        'type': 'circle',
-        'source': 'places',
-        'paint': {
-            // make circles larger as the user zooms from z12 to z22
-            'circle-radius': 9.75,
-            // color circles by ethnicity, using a match expression
-            // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
-            'circle-color': 'orange',
-            'circle-stroke-color': 'white',
-            'circle-stroke-width': 2
-        }
-    });
-
-    trainingGeojson.features.forEach(function (feature) {
-        bounds.extend(feature.geometry.coordinates);
-    });
-
-    map.fitBounds(bounds, {
-        padding: 20,
-        linear: false
-    });
-
-    // When a click event occurs on a feature in the places layer, open a popup at the
-    // location of the feature, with description HTML from its properties.
-    var description = []
-    map.on('click', 'places', function (e) {
-        for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
-            var coordinates = e.features[0].geometry.coordinates.slice();
-            description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}`;
-            // Ensure that if the map is zoomed out such that multiple
-            // copies of the feature are visible, the popup appears
-            // over the copy being pointed to.
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            }
-
-        }
-
-        new mapboxgl.Popup()
-            .setLngLat(coordinates)
-            .setHTML(description)
-            .addTo(map);
-
-    });
-
-    // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'places', function () {
-        map.getCanvas().style.cursor = 'pointer';
-    });
-
-    // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'places', function () {
-        map.getCanvas().style.cursor = 'default';
-    });
 
     // yep you guessed right! prevent page reload on form submit :-)
     performTrainingForm.addEventListener('submit', handleForm);
@@ -199,8 +203,8 @@ function performTraining(trainingGeojson) {
     }
     // train data and generate a variogram
     var variogram = train(t, x, y, model, sigma2, alpha);
-    testButton.addEventListener('change', handleForm);
-    testButton.addEventListener('change', function () {
+    testButtonInput.addEventListener('change', handleForm);
+    testButtonInput.addEventListener('change', function () {
         addTestData(variogram, selectedVariable)
         $('.tap-target').tapTarget('open')
         info.innerHTML = `<h5  style="font-family: 'Patrick Hand', cursive;">Good Job. Download your predictions.</h5>`
@@ -211,13 +215,16 @@ function performTraining(trainingGeojson) {
 function addTestData(variogram, selectedVariable) {
     var input = document.getElementById("test_data");
     var reader = new FileReader()
-   
+
     reader.onload = function () {
         var dataUrl = reader.result
         var testingGeojson = JSON.parse(dataUrl);
         // Predict new data using generated variogram model 
         performPrediction(testingGeojson, variogram, selectedVariable)
-
+        testButton.classList.add('disabled')
+        testButton.addEventListener('mouseenter', function () {
+            testButton.style.cursor = 'not-allowed'
+        })
     }
     reader.readAsText(input.files[0]);
 
