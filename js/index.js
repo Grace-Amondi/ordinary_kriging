@@ -9,21 +9,21 @@ var bounds = new mapboxgl.LngLatBounds();
 $(".button-collapse").sideNav();
 
 // page preloader 
-window.onload=  function() {
+window.onload = function () {
     $('.loader').fadeOut('slow');
     document.getElementById("page").style.visibility = 'visible'
 
     // welcome popup 
     setTimeout(function () { $('.tap-target').tapTarget('open') }, 5000)
     setTimeout(function () { $('.tap-target').tapTarget('close') }, 10000)
- }
+}
 
 var varOption = document.getElementById("variables")
-var predictForm = document.getElementById("predictForm")
 var performTrainingForm = document.getElementById("trainForm")
 var dataInput = document.getElementById("train_data")
 var downloadButton = document.getElementById("download_data")
 var dataButton = document.getElementById("train_data_button")
+var testButton = document.getElementById("test_data")
 // // welcome popup 
 var info = document.getElementById("info")
 
@@ -55,42 +55,23 @@ function handleForm(event) { event.preventDefault(); }
 function uploadBothData() {
     // upload datasets
     var input = document.getElementById("train_data");
-    // var input = event.target;
-    var fileData = [];
-    if (input.files.length === 2) {
-        for (var i = 0; i < input.files.length; i++) {
-            var reader = new FileReader();
-            reader.onload = function () {
-                var dataURL = event.target.result;
-                var trainingGeojson = JSON.parse(dataURL);
-                fileData.push(trainingGeojson);
+    var reader = new FileReader();
+    reader.onload = function () {
+        var dataURL = reader.result;
+        var trainingGeojson = JSON.parse(dataURL);
 
-                addTrainToMap(fileData);
+        addTrainToMap(trainingGeojson);
 
-            };
+    };
 
-            reader.readAsText(input.files[i]);
-        }
-        dataButton.classList.add('disabled')
-        dataButton.addEventListener('mouseenter', function () {
-            dataButton.style.cursor = 'not-allowed'
-        })
+    reader.readAsText(input.files[0]);
+    dataButton.classList.add('disabled')
+    dataButton.addEventListener('mouseenter', function () {
+        dataButton.style.cursor = 'not-allowed'
+    })
 
-        $('.tap-target').tapTarget('open')
-        info.innerHTML = `<h5 style="font-family: 'Patrick Hand', cursive;">Woohoo! Go ahead and train your model</h5>`
-    } else {
-        toastr.options = {
-            "closeButton": false,
-            "timeOut": 7000,
-            "positionClass": "toast-top-right",
-            "showMethod": 'slideDown',
-            "hideMethod": 'slideUp',
-            "closeMethod": 'slideUp',
-        };
-        toastr.error(`<p style="font-family: 'Patrick Hand', cursive;">Woiyee.. We need a training and testing data respectively</p>`);
-    }
-
-
+    $('.tap-target').tapTarget('open')
+    info.innerHTML = `<h5 style="font-family: 'Patrick Hand', cursive;">Woohoo! Go ahead and train your model</h5>`
 
 }
 
@@ -98,14 +79,14 @@ function uploadBothData() {
 dataInput.addEventListener("change", uploadBothData, false)
 
 // add train data to map 
-function addTrainToMap(fileData) {
+function addTrainToMap(trainingGeojson) {
     // get variables in train data 
-    var variableOptions = Object.values(fileData[0].features[0].properties);
+    var variableOptions = Object.values(trainingGeojson.features[0].properties);
     // only use numeric data types 
     if (typeof (variableOptions[0]) == 'number') {
         for (let n = 0; n < variableOptions.length; n++) {
             // initialize select field material 
-            varOption.innerHTML += `<option value="${Object.keys(fileData[0].features[0].properties)[n]}">${Object.keys(fileData[0].features[0].properties)[n]}</option>`;
+            varOption.innerHTML += `<option value="${Object.keys(trainingGeojson.features[0].properties)[n]}">${Object.keys(trainingGeojson.features[0].properties)[n]}</option>`;
             $('select').material_select();
         }
     }
@@ -121,13 +102,11 @@ function addTrainToMap(fileData) {
         toastr.error(`<p  style="font-family: 'Patrick Hand', cursive;">Your Trainind Dataset does not contain any numeric variable</p>`);
         console.log("no numeric variable");
     }
-    // get bounding box for train data 
-    var bbox = turf.bbox(fileData[0]);
 
     // add training geojson data to map 
     map.addSource('places', {
         type: 'geojson',
-        data: fileData[0]
+        data: trainingGeojson
     });
     map.addLayer({
         'id': 'places',
@@ -144,7 +123,7 @@ function addTrainToMap(fileData) {
         }
     });
 
-    fileData[0].features.forEach(function (feature) {
+    trainingGeojson.features.forEach(function (feature) {
         bounds.extend(feature.geometry.coordinates);
     });
 
@@ -191,7 +170,7 @@ function addTrainToMap(fileData) {
     // perform training when submit button is clicked. I know TMI. lol :-) 
     performTrainingForm.addEventListener('submit',
         function () {
-            performTraining(fileData)
+            performTraining(trainingGeojson)
 
             $('.tap-target').tapTarget('open')
             info.innerHTML = `<h5  style="font-family: 'Patrick Hand', cursive;">Yey!! Model has been trained. Let's Predict</h5>`
@@ -200,65 +179,63 @@ function addTrainToMap(fileData) {
 }
 
 // Train variogram model using train data i.e fileData[0]
-function performTraining(fileData) {
+function performTraining(trainingGeojson) {
     var userInput = $("#trainForm").serializeArray();
-    // only perform training if user provided two datasets 
-    if (fileData.length === 2) {
-        // generate variogram 
-        var model = userInput[1].value;
-        var sigma2 = userInput[2].value;
-        var alpha = userInput[3].value;
-        var t = [];
-        var x = [];
-        var y = [];
-        var selectedVariable = varOption.options[varOption.selectedIndex].value;
-        for (var i = 0; i < fileData[0].features.length; i++) {
-            var variable = fileData[0].features[i].properties[`${selectedVariable}`];
-            var X = fileData[0].features[i].geometry.coordinates[1];
-            var Y = fileData[0].features[i].geometry.coordinates[0];
-            t.push(variable);
-            x.push(X);
-            y.push(Y);
-        }
-        var trained = train(t, x, y, model, sigma2, alpha);
-        predictForm.addEventListener('submit', handleForm);
-        predictForm.addEventListener('submit', function () {
-            performPrediction(trained, fileData, selectedVariable)
-
-            $('.tap-target').tapTarget('open')
-            info.innerHTML = `<h5  style="font-family: 'Patrick Hand', cursive;">Good Job. Download your predictions.</h5>`
-        })
-
-    } else {
-        toastr.options = {
-            "closeButton": false,
-            "timeOut": 7000,
-            "positionClass": "toast-top-right",
-            "showMethod": 'slideDown',
-            "hideMethod": 'slideUp',
-            "closeMethod": 'slideUp',
-        };
-        toastr.error(`<p style="font-family: 'Patrick Hand', cursive;">You forgot to provide two datasets </p>`);
+    // generate variogram 
+    var model = userInput[1].value;
+    var sigma2 = userInput[2].value;
+    var alpha = userInput[3].value;
+    var t = [];
+    var x = [];
+    var y = [];
+    var selectedVariable = varOption.options[varOption.selectedIndex].value;
+    for (var i = 0; i < trainingGeojson.features.length; i++) {
+        var variable = trainingGeojson.features[i].properties[`${selectedVariable}`];
+        var X = trainingGeojson.features[i].geometry.coordinates[1];
+        var Y = trainingGeojson.features[i].geometry.coordinates[0];
+        t.push(variable);
+        x.push(X);
+        y.push(Y);
     }
+    // train data and generate a variogram
+    var variogram = train(t, x, y, model, sigma2, alpha);
+    testButton.addEventListener('change', handleForm);
+    testButton.addEventListener('change', function () {
+        addTestData(variogram, selectedVariable)
+        $('.tap-target').tapTarget('open')
+        info.innerHTML = `<h5  style="font-family: 'Patrick Hand', cursive;">Good Job. Download your predictions.</h5>`
+    })
+
 };
 
-// Predict new data using generated variogram model 
-function performPrediction(trained, fileData, selectedVariable) {
+function addTestData(variogram, selectedVariable) {
+    var input = document.getElementById("test_data");
+    var reader = new FileReader()
+   
+    reader.onload = function () {
+        var dataUrl = reader.result
+        var testingGeojson = JSON.parse(dataUrl);
+        // Predict new data using generated variogram model 
+        performPrediction(testingGeojson, variogram, selectedVariable)
+
+    }
+    reader.readAsText(input.files[0]);
+
+
+}
+function performPrediction(testingGeojson, variogram, selectedVariable) {
     // predict new data 
     var predctions = []
-    for (var i = 0; i < trained.n; i++) {
-        var xnew = fileData[1].features[i].geometry.coordinates[1];
-        var ynew = fileData[1].features[i].geometry.coordinates[0];
-        var tpredicted = kriging.kriging.predict(xnew, ynew, trained);
+    for (var i = 0; i < variogram.n; i++) {
+        var xnew = testingGeojson.features[i].geometry.coordinates[1];
+        var ynew = testingGeojson.features[i].geometry.coordinates[0];
+        var tpredicted = kriging.kriging.predict(xnew, ynew, variogram);
         var geom = turf.point([ynew, xnew], { predicted: tpredicted });
         predctions.push(geom)
 
     }
     console.log(predctions)
     var collection = turf.featureCollection(predctions);
-
-    // get bounding box for test data 
-    var bbox = turf.bbox(fileData[1]);
     // add test data to map 
     map.addSource(`predict`, {
         type: 'geojson',
@@ -280,7 +257,7 @@ function performPrediction(trained, fileData, selectedVariable) {
     });
     var bounds = new mapboxgl.LngLatBounds();
 
-    fileData[1].features.forEach(function (feature) {
+    testingGeojson.features.forEach(function (feature) {
         bounds.extend(feature.geometry.coordinates);
     });
 
@@ -288,7 +265,7 @@ function performPrediction(trained, fileData, selectedVariable) {
         padding: 20,
         linear: false
     });
-    
+
     // Change the cursor to a pointer when the mouse is over the places layer.
     map.on('mouseenter', 'predict', function () {
         map.getCanvas().style.cursor = 'pointer';
@@ -319,13 +296,14 @@ function performPrediction(trained, fileData, selectedVariable) {
             .addTo(map);
 
     });
-    
+
     downloadButton.addEventListener('click', handleForm)
     downloadButton.addEventListener('click', function () {
         downloadPredictions(collection, `${selectedVariable}_prediction`)
     }, false)
 
 }
+
 // download predicted data 
 function downloadPredictions(content, filename) {
     var file = filename + '.geojson';

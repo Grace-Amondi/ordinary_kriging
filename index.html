@@ -70,7 +70,7 @@
                             <form id="uploadtrainForm">
                                 <div class="file-field input-field">
                                     <div class="btn waves-effect waves-light orange darken-1" id="train_data_button">
-                                        <span class=" white-text">Upload Train and Test Geojson<i
+                                        <span class=" white-text">Upload Training Geojson<i
                                                 class="material-icons right">attach_file</i></span>
                                         <input id="train_data" type="file" accept=".geojson" multiple>
                                     </div>
@@ -129,9 +129,16 @@
                         </div>
                         <div id="predict">
                             <form id="predictForm">
+                                <div class="file-field input-field">
+                                    <div class="btn waves-effect waves-light orange darken-1" id="test_data_button">
+                                        <span class=" white-text">Upload Test Data and Predict<i
+                                                class="material-icons right">attach_file</i></span>
+                                        <input id="test_data" type="file" accept=".geojson">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" id="filetest_name" type="text">
+                                    </div>
                                 
-                                <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
-                                    value="Predict and Visualize"><i class="material-icons right">bubble_chart</i>
                                 <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse" id="predict_data">Predict and Visualize<i
                                         class="material-icons right">bubble_chart</i></a> -->
                             </form>
