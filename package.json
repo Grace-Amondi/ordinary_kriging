@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/Grace-Amondi/ordinary_kriging#readme",
   "dependencies": {
-    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "lodash.assign": "^4.2.0",
     "mapbox-gl": "^1.9.1",

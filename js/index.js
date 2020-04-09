@@ -28,7 +28,7 @@ var testButton = document.getElementById("test_data_button")
 // // welcome popup 
 var info = document.getElementById("info")
 
-// map container 
+// map container //replace with your mapbox access token
 mapboxgl.accessToken = 'pk.eyJ1IjoiZ3JhY2VhbW9uZGkiLCJhIjoiY2poampha2g1MDQ5czNkcXplMzMycGJtYyJ9.uec448K2BkM1FADfN4YA9Q';
 var map = new mapboxgl.Map({
     container: 'map',
