@@ -8,15 +8,23 @@ var bounds = new mapboxgl.LngLatBounds();
 // mobile nav bar 
 $(".button-collapse").sideNav();
 
+// page preloader 
+window.onload=  function() {
+    $('.loader').fadeOut('slow');
+    document.getElementById("page").style.visibility = 'visible'
+
+    // welcome popup 
+    setTimeout(function () { $('.tap-target').tapTarget('open') }, 5000)
+    setTimeout(function () { $('.tap-target').tapTarget('close') }, 10000)
+ }
+
 var varOption = document.getElementById("variables")
 var predictForm = document.getElementById("predictForm")
 var performTrainingForm = document.getElementById("trainForm")
 var dataInput = document.getElementById("train_data")
 var downloadButton = document.getElementById("download_data")
 var dataButton = document.getElementById("train_data_button")
-// welcome popup 
-window.onload = setTimeout(function () { $('.tap-target').tapTarget('open') }, 5000)
-window.onload = setTimeout(function () { $('.tap-target').tapTarget('close') }, 10000)
+// // welcome popup 
 var info = document.getElementById("info")
 
 // map container 
@@ -142,9 +150,9 @@ function addTrainToMap(fileData) {
 
     map.fitBounds(bounds, {
         padding: 20,
-        linear:false
+        linear: false
     });
-    
+
     // When a click event occurs on a feature in the places layer, open a popup at the
     // location of the feature, with description HTML from its properties.
     var description = []
@@ -175,7 +183,7 @@ function addTrainToMap(fileData) {
 
     // Change it back to a pointer when it leaves.
     map.on('mouseleave', 'places', function () {
-        map.getCanvas().style.cursor = '';
+        map.getCanvas().style.cursor = 'default';
     });
 
     // yep you guessed right! prevent page reload on form submit :-)
@@ -278,8 +286,19 @@ function performPrediction(trained, fileData, selectedVariable) {
 
     map.fitBounds(bounds, {
         padding: 20,
-        linear:false
+        linear: false
     });
+    
+    // Change the cursor to a pointer when the mouse is over the places layer.
+    map.on('mouseenter', 'predict', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+
+    // Change it back to a pointer when it leaves.
+    map.on('mouseleave', 'predict', function () {
+        map.getCanvas().style.cursor = 'default';
+    });
+
     var description = []
     map.on('click', 'predict', function (e) {
         for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
@@ -300,6 +319,7 @@ function performPrediction(trained, fileData, selectedVariable) {
             .addTo(map);
 
     });
+    
     downloadButton.addEventListener('click', handleForm)
     downloadButton.addEventListener('click', function () {
         downloadPredictions(collection, `${selectedVariable}_prediction`)
