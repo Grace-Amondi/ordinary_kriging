@@ -8,7 +8,7 @@ Geostatistical Prediction with ordinary kriging
 Ordinary Kriging is a spatial estimation method where the error variance is minimized. 
 This error variance is called the kriging variance. It is based on the configuration of the data and on the variogram. For example, say we are studying copper concentration in soil,
 your training data is point data with attribute information..say copper concentration at each point.The test data contains just point data...without copper concentration.The train data is used
-to create a variogram which predicts the copper concentration for the test data. Try [Demo](http://ordinary-kriging.surge.sh "demo application") or view demo on [youtube](https://www.youtube.com/watch?v=Y1Md18hFwwg "youtube demo").
+to create a variogram which predicts the copper concentration for the test data. Try [Demo](https://ordinary-kriging.surge.sh "demo application") or view demo on [youtube](https://www.youtube.com/watch?v=Y1Md18hFwwg "youtube demo").
 
 According to [sakitam-gis](https://sakitam-gis.github.io/kriging.js/examples/world.html "kriging docs"),the various variogram models can be interpreted as kernel functions for 2-dimensional coordinates a, b and parameters nugget, range, sill and A. Reparameterized as a linear function, with w = [nugget, (sill-nugget)/range], this becomes:
 
@@ -97,4 +97,5 @@ into a minified version.Parcel also converts JS assets to ES5.
 [Materialize](https://materializecss.com/ "Materialize") has been used to design the app's beautiful user interface with mobile responsiveness,
 grids and cards. 
 
-
+### Geojson-Generator
+[Geojson-Generator](https://geojson-generator.surge.sh/ "Geojson-Generator") is a tool that enables generation of random geojson point data within a specified bounding box. This application used it to generate random numeric point data for testing.
