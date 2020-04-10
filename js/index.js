@@ -1,9 +1,11 @@
+// import mapboxgl from 'mapbox-gl'
 import RulerControl from 'mapbox-gl-controls/lib/ruler';
 import CompassControl from 'mapbox-gl-controls/lib/compass';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 import AroundControl from 'mapbox-gl-controls/lib/around'
 import kriging from './kriging'
-var bounds = new mapboxgl.LngLatBounds();
+import {point, featureCollection} from '@turf/helpers'
+
 
 require('dotenv').config()
 
@@ -44,6 +46,7 @@ map.addControl(new ZoomControl(), 'top-left');
 map.addControl(new RulerControl(), 'top-left');
 map.addControl(new AroundControl(), 'top-left')
 map.addControl(new CompassControl(), 'top-left');
+var bounds = new mapboxgl.LngLatBounds();
 
 // train incoming data 
 function train(t, x, y, model, sigma2, alpha) {
@@ -267,11 +270,11 @@ function performPrediction(testingGeojson, variogram, selectedVariable) {
         var xnew = testingGeojson.features[i].geometry.coordinates[1];
         var ynew = testingGeojson.features[i].geometry.coordinates[0];
         var tpredicted = kriging.kriging.predict(xnew, ynew, variogram);
-        var geom = turf.point([ynew, xnew], { predicted: tpredicted });
+        var geom = point([ynew, xnew], { predicted: tpredicted });
         predctions.push(geom)
 
     }
-    var collection = turf.featureCollection(predctions);
+    var collection = featureCollection(predctions);
     // add test data to map 
     map.addSource(`Predicted Layer`, {
         type: 'geojson',
@@ -318,8 +321,6 @@ function performPrediction(testingGeojson, variogram, selectedVariable) {
 
         var layers = document.getElementById('layergroup');
         layers.appendChild(link);
-
-    var bounds = new mapboxgl.LngLatBounds();
 
     testingGeojson.features.forEach(function (feature) {
         bounds.extend(feature.geometry.coordinates);

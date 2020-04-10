@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Grace-Amondi/ordinary_kriging#readme",
   "dependencies": {
+    "@turf/helpers": "^6.1.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "lodash.assign": "^4.2.0",
