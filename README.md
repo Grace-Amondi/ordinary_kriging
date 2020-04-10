@@ -2,7 +2,8 @@
 
 ## Introduction
 
-![Application](https://github.com/Grace-Amondi/ordinary_kriging/blob/master/images/home.png "Application Demo")
+
+![demo](https://github.com/Grace-Amondi/ordinary_kriging/blob/master/images/media.io_1c54ae75-69c9-4b33-9931-3682c7d7e93a-_1_.gif) 
 
 Geostatistical Prediction with ordinary kriging 
 Ordinary Kriging is a spatial estimation method where the error variance is minimized. 
