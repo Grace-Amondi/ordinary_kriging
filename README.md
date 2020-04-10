@@ -1,4 +1,7 @@
 # Ordinary Kriging
+
+![Application](https://github.com/Grace-Amondi/ordinary_kriging/blob/master/images/home.png "Application Demo")
+
 Geostatistical Prediction with ordinary kriging 
 Ordinary Kriging is a spatial estimation method where the error variance is minimized. 
 This error variance is called the kriging variance. It is based on the configuration of the data and on the variogram. For example, say we are studying copper concentration in soil,
@@ -29,9 +32,9 @@ Open application at http://localhost:1234
 
 ---
 
-## Build for development
+## Build for production
 
-To build the app for development,
+To build the app for production,
 
 ```npm run build```
 
@@ -65,7 +68,8 @@ files (or raw data buffers) stored on the user's computer, using File or Blob ob
 in reading of training and test geojson data.
 
 ### FileSaver
-FileSaver enables saving files on the client-side which is exactly what it was used for in this application. With the saveAs() 
+
+[FileSaver](https://github.com/eligrey/FileSaver.js/ "filesaver") enables saving files on the client-side which is exactly what it was used for in this application. With the saveAs() 
 function you are good to go.
 
 ### Parcel
