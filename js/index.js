@@ -5,6 +5,8 @@ import AroundControl from 'mapbox-gl-controls/lib/around'
 import kriging from './kriging'
 var bounds = new mapboxgl.LngLatBounds();
 
+require('dotenv').config()
+
 // mobile nav bar 
 $(".button-collapse").sideNav();
 
@@ -29,7 +31,7 @@ var testButton = document.getElementById("test_data_button")
 var info = document.getElementById("info")
 
 // map container //replace with your mapbox access token
-mapboxgl.accessToken = 'pk.eyJ1IjoiZ3JhY2VhbW9uZGkiLCJhIjoiY2poampha2g1MDQ5czNkcXplMzMycGJtYyJ9.uec448K2BkM1FADfN4YA9Q';
+mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/graceamondi/ck1p6wqfs0vj81cqwbikdv87j',

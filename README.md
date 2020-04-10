@@ -20,7 +20,7 @@ Move into the ordinary_kriging directory
 
 ```cd ordinary_kriging```
 
-Set your *mapbox access token* in index.js.Install node modules
+Change .env.example to .env and Set your *mapbox access token*.Install node modules
 
 ```npm install```
 
