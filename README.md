@@ -1,12 +1,29 @@
 # Ordinary Kriging
 
+## Introduction
+
 ![Application](https://github.com/Grace-Amondi/ordinary_kriging/blob/master/images/home.png "Application Demo")
 
 Geostatistical Prediction with ordinary kriging 
 Ordinary Kriging is a spatial estimation method where the error variance is minimized. 
 This error variance is called the kriging variance. It is based on the configuration of the data and on the variogram. For example, say we are studying copper concentration in soil,
 your training data is point data with attribute information..say copper concentration at each point.The test data contains just point data...without copper concentration.The train data is used
-to create a variogram which predicts the copper concentration for the test data. Try [Demo](http://ordinary-kriging.surge.sh "demo application")
+to create a variogram which predicts the copper concentration for the test data. Try [Demo](http://ordinary-kriging.surge.sh "demo application") or view demo on [youtube](https://www.youtube.com/watch?v=Y1Md18hFwwg "youtube demo").
+
+According to [sakitam-gis](https://sakitam-gis.github.io/kriging.js/examples/world.html "kriging docs"),the various variogram models can be interpreted as kernel functions for 2-dimensional coordinates a, b and parameters nugget, range, sill and A. Reparameterized as a linear function, with w = [nugget, (sill-nugget)/range], this becomes:
+
+- Gaussian: k(a,b) = w[0] + w[1] * ( 1 - exp{ -( ||a-b|| / range )2 / A } )
+- Exponential: k(a,b) = w[0] + w[1] * ( 1 - exp{ -( ||a-b|| / range ) / A } )
+- Spherical: k(a,b) = w[0] + w[1] * ( 1.5 * ( ||a-b|| / range ) - 0.5 * ( ||a-b|| / range )3 )
+
+The variance parameter α of the prior distribution for w should be manually set, according to:
+
+- w ~ N(w|0, αI)
+
+Using the fitted kernel function hyperparameters and setting K as the Gram matrix, the prior and likelihood for the gaussian process become:
+
+- y ~ N(y|0, K)
+- t|y ~ N(t|y, σ2I)
 
 ---
 
