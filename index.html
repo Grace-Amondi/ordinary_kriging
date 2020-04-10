@@ -29,32 +29,34 @@
                 <a href="index.html" class="brand-logo "><i class="material-icons">grain</i>Ordinary Kriging</a>
                 <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons ">menu</i></a>
                 <ul class="right hide-on-med-and-down">
-                    <li><a href="about.html" style="font-size: 18px;font-family: 'Patrick Hand', cursive;">About</a></li>
-                    <li><a href="https://github.com/Grace-Amondi/ordinary_kriging" target="_blank" style="font-size: 18px;font-family: 'Patrick Hand', cursive;">Github</a></li>
+                    <li><a href="https://github.com/Grace-Amondi/ordinary_kriging" target="_blank"
+                            style="font-size: 18px;font-family: 'Patrick Hand', cursive;">Github</a></li>
                     <li><a id="menu" class="waves-effect waves-light btn btn-floating #ffe0b2 orange lighten-2"
                             onclick="$('.tap-target').tapTarget('open')"><i class="material-icons right">help</i></a>
                     </li>
                 </ul>
                 <ul class="side-nav" id="mobile-demo">
-                    <li><a href="about.html">About</a></li>
                     <li><a href="https://github.com/Grace-Amondi/ordinary_kriging" target="_blank">Github</a></li>
-                    <!-- <li><a href="#">Mobile</a></li> -->
+                    <li><a id="menu" class="waves-effect waves-light btn btn-floating #ffe0b2 orange lighten-2"
+                            onclick="$('.tap-target').tapTarget('open')"><i class="material-icons right">help</i></a>
+                    </li>
                 </ul>
             </div>
         </nav>
-    
-    
-    
+
+
+
         <!-- Page Layout here -->
         <div class="row">
-    
+
             <div class="col s12 m4 l4 #ffe0b2 orange lighten-5">
-    
+
                 <div class="card #ffcc80 orange lighten-1 ">
                     <div class="card-content black-text">
                         <p>Ordinary Kriging is a spatial estimation method where the error variance is minimized.
                             This error variance is called the kriging variance.
-                            It is based on the configuration of the data and on the variogram, hence is is homoescedastic .
+                            It is based on the configuration of the data and on the variogram, hence is is
+                            homoescedastic .
                         </p>
                     </div>
                     <div class="card-tabs ">
@@ -78,21 +80,23 @@
                                         <input class="file-path validate" id="filetrain_name" type="text">
                                     </div>
                                 </div>
-    
+
                                 <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse">Train Dataset<i
                                         class="material-icons right">hourglass_empty</i></a> -->
-    
+
                             </form>
-    
+
                         </div>
                         <div id="train">
                             <form id="trainForm">
                                 <div class="input-field">
-                                    <select id="variables" name="copper">
+                                    <select id="variables" name="variable">
                                         <option value="" disabled selected>Choose your variable</option>
                                         <!-- <option value="copper">Copper</option> -->
                                     </select>
-                                    <label for="variables"  style="font-size: 18px;font-family: 'Patrick Hand', cursive;color:black">Select training variable</label>
+                                    <label for="variables"
+                                        style="font-size: 18px;font-family: 'Patrick Hand', cursive;color:black">Select
+                                        training variable</label>
                                 </div>
                                 <label>Select variogram model</label>
                                 <p>
@@ -104,27 +108,27 @@
                                     <input class="with-gap" name="group1" type="radio" id="test1" value="gaussian" />
                                     <label for="test1">Gaussian</label>
                                 </p>
-    
+
                                 <p>
                                     <input class="with-gap" name="group1" type="radio" value="spherical" id="test3" />
                                     <label for="test3">Spherical</label>
-    
+
                                 </p>
                                 <label>Sigma value</label>
-    
+
                                 <p class="range-field ">
-    
+
                                     <input name="range1" type="range" id="test9" min="0" max="10" />
                                 </p>
-    
+
                                 <label>Alpha value</label>
-    
+
                                 <p class="range-field">
                                     <input name="range2" type="range" id="test10" min="0" max="10" />
                                 </p>
                                 <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
                                     value="Train Model" id="train_button">
-    
+
                             </form>
                         </div>
                         <div id="predict">
@@ -138,19 +142,19 @@
                                     <div class="file-path-wrapper">
                                         <input class="file-path validate" id="filetest_name" type="text">
                                     </div>
-                                
-                                <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse" id="predict_data">Predict and Visualize<i
+
+                                    <!-- <a href="" class="btn waves-effect waves-light orange darken-1 pulse" id="predict_data">Predict and Visualize<i
                                         class="material-icons right">bubble_chart</i></a> -->
                             </form>
-    
+
                         </div>
                         <div id="export">
-    
-                            <a href="" class="btn waves-effect waves-light orange darken-1 pulse" id="download_data">Download Geojson<i
-                                    class="material-icons right">get_app</i></a>
+
+                            <a href="" class="btn waves-effect waves-light orange darken-1 pulse"
+                                id="download_data">Download Geojson<i class="material-icons right">get_app</i></a>
                         </div>
                     </div>
-    
+
                 </div>
                 <!-- Note that "m4 l3" was added -->
                 <!-- Grey navigation panel
@@ -159,16 +163,16 @@
                 3-columns-wide on large screens,
                 4-columns-wide on medium screens,
                 12-columns-wide on small screens  -->
-    
+
             </div>
             <div id="layergroup"></div>
             <div class="col s12 m8 l8" id="map">
                 <a id="menu" onclick="$('.tap-target').tapTarget('open')"></a>
-    
+
                 <!-- Tap Target Structure -->
                 <div class="tap-target #ffcc80 orange lighten-2" data-activates="menu">
                     <div class="tap-target-content black-text" id="info" style="text-align: right;">
-                        <h5  style="font-family: 'Patrick Hand', cursive;">It's Easy</h5>
+                        <h5 style="font-family: 'Patrick Hand', cursive;">It's Easy</h5>
                         <p>Upload a train dataset geojson format.
                             Select the target variable for variogram modelling.
                             Set Sigma and Alpha values and Train model.Add test dataset and Predict.
@@ -176,9 +180,9 @@
                         </p>
                     </div>
                 </div>
-    
+
             </div>
-    
+
         </div>
     </div>
 

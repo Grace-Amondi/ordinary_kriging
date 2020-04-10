@@ -83,7 +83,9 @@ function addTrainToMap(trainingGeojson) {
         for (let n = 0; n < variableOptions.length; n++) {
             // initialize select field material 
             varOption.innerHTML += `<option value="${Object.keys(trainingGeojson.features[0].properties)[n]}">${Object.keys(trainingGeojson.features[0].properties)[n]}</option>`;
+           
             $('select').material_select();
+            
         }
         dataButton.classList.add('disabled')
         dataButton.addEventListener('mouseenter', function () {
@@ -152,7 +154,7 @@ function addTrainToMap(trainingGeojson) {
         map.on('click', 'Train Layer', function (e) {
             for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
                 var coordinates = e.features[0].geometry.coordinates.slice();
-                description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}`;
+                description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}<br>`;
                 // Ensure that if the map is zoomed out such that multiple
                 // copies of the feature are visible, the popup appears
                 // over the copy being pointed to.
@@ -259,7 +261,7 @@ function addTestData(variogram, selectedVariable) {
 function performPrediction(testingGeojson, variogram, selectedVariable) {
     // predict new data 
     var predctions = []
-    for (var i = 0; i < variogram.n; i++) {
+    for (var i = 0; i < testingGeojson.features.length; i++) {
         var xnew = testingGeojson.features[i].geometry.coordinates[1];
         var ynew = testingGeojson.features[i].geometry.coordinates[0];
         var tpredicted = kriging.kriging.predict(xnew, ynew, variogram);
@@ -267,7 +269,6 @@ function performPrediction(testingGeojson, variogram, selectedVariable) {
         predctions.push(geom)
 
     }
-    console.log(predctions)
     var collection = turf.featureCollection(predctions);
     // add test data to map 
     map.addSource(`Predicted Layer`, {
@@ -341,7 +342,7 @@ function performPrediction(testingGeojson, variogram, selectedVariable) {
     map.on('click', 'Predicted Layer', function (e) {
         for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
             var coordinates = e.features[0].geometry.coordinates.slice();
-            description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}`;
+            description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}<br>`;
             // Ensure that if the map is zoomed out such that multiple
             // copies of the feature are visible, the popup appears
             // over the copy being pointed to.
