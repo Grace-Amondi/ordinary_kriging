@@ -4,7 +4,7 @@ import CompassControl from 'mapbox-gl-controls/lib/compass';
 import ZoomControl from 'mapbox-gl-controls/lib/zoom';
 import AroundControl from 'mapbox-gl-controls/lib/around'
 import kriging from './kriging'
-import {point, featureCollection} from '@turf/helpers'
+import { point, featureCollection } from '@turf/helpers'
 
 
 require('dotenv').config()
@@ -29,9 +29,20 @@ var downloadButton = document.getElementById("download_data")
 var dataButton = document.getElementById("train_data_button")
 var testButtonInput = document.getElementById("test_data")
 var testButton = document.getElementById("test_data_button")
+var sigmaRange = document.getElementById("sigma")
+var alphaRange = document.getElementById("alpha")
+var sigmaBadge = document.getElementById("sigmaBadge")
+var alphaBadge = document.getElementById("alphaBadge")
+
 // // welcome popup 
 var info = document.getElementById("info")
 
+sigmaRange.addEventListener("change", function () {
+    sigmaBadge.innerHTML = sigmaRange.value
+})
+alphaRange.addEventListener("change", function () {
+    alphaBadge.innerHTML = alphaRange.value
+})
 // map container //replace with your mapbox access token
 mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN
 var map = new mapboxgl.Map({
@@ -65,7 +76,6 @@ function uploadBothData() {
     reader.onload = function () {
         var dataURL = reader.result;
         var trainingGeojson = JSON.parse(dataURL);
-
         addTrainToMap(trainingGeojson);
 
     };
@@ -83,112 +93,126 @@ dataInput.addEventListener("change", uploadBothData, false)
 function addTrainToMap(trainingGeojson) {
     // get variables in train data 
     var variableOptions = Object.values(trainingGeojson.features[0].properties);
-    // only use numeric data types 
-    if (typeof (variableOptions[0]) == 'number') {
-        for (let n = 0; n < variableOptions.length; n++) {
-            // initialize select field material 
-            varOption.innerHTML += `<option value="${Object.keys(trainingGeojson.features[0].properties)[n]}">${Object.keys(trainingGeojson.features[0].properties)[n]}</option>`;
-           
-            $('select').material_select();
-            
-        }
-        dataButton.classList.add('disabled')
-        dataButton.addEventListener('mouseenter', function () {
-            dataButton.style.cursor = 'not-allowed'
-        })
-        $('.tap-target').tapTarget('open')
-        info.innerHTML = `<h5 style="font-family: 'Patrick Hand', cursive;">Woohoo! Go ahead and train your model</h5>`
-        // add training geojson data to map 
-        map.addSource('Train Layer', {
-            type: 'geojson',
-            data: trainingGeojson
-        });
-        map.addLayer({
-            'id': 'Train Layer',
-            'type': 'circle',
-            'source': 'Train Layer',
-            'paint': {
-                // make circles larger as the user zooms from z12 to z22
-                'circle-radius': 9.75,
-                // color circles by ethnicity, using a match expression
-                // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
-                'circle-color': 'orange',
-                'circle-stroke-color': 'white',
-                'circle-stroke-width': 2
+    // only point data 
+    if (trainingGeojson.features[0].geometry.type == 'Point') {
+        // only use numeric data types 
+        if (typeof (variableOptions[0]) == 'number') {
+            for (let n = 0; n < variableOptions.length; n++) {
+                // initialize select field material 
+                varOption.innerHTML += `<option value="${Object.keys(trainingGeojson.features[0].properties)[n]}">${Object.keys(trainingGeojson.features[0].properties)[n]}</option>`;
+
+                $('select').material_select();
+
             }
-        });
+            dataButton.classList.add('disabled')
+            dataButton.addEventListener('mouseenter', function () {
+                dataButton.style.cursor = 'not-allowed'
+            })
+            $('.tap-target').tapTarget('open')
+            info.innerHTML = `<h5 style="font-family: 'Patrick Hand', cursive;">Woohoo! Go ahead and train your model</h5>`
+            // add training geojson data to map 
+            map.addSource('Train Layer', {
+                type: 'geojson',
+                data: trainingGeojson
+            });
+            map.addLayer({
+                'id': 'Train Layer',
+                'type': 'circle',
+                'source': 'Train Layer',
+                'paint': {
+                    // make circles larger as the user zooms from z12 to z22
+                    'circle-radius': 9.75,
+                    // color circles by ethnicity, using a match expression
+                    // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
+                    'circle-color': 'orange',
+                    'circle-stroke-color': 'white',
+                    'circle-stroke-width': 2
+                }
+            });
 
-        trainingGeojson.features.forEach(function (feature) {
-            bounds.extend(feature.geometry.coordinates);
-        });
+            trainingGeojson.features.forEach(function (feature) {
+                bounds.extend(feature.geometry.coordinates);
+            });
 
-        map.fitBounds(bounds, {
-            padding: 20,
-            linear: false
-        });
-        var toggleableLayerIds = 'Train Layer'
+            map.fitBounds(bounds, {
+                padding: 20,
+                linear: false
+            });
+            var toggleableLayerIds = 'Train Layer'
 
-        var link = document.createElement('a');
-        link.href = '#';
-        link.className = 'active';
-        link.innerHTML = `&#10004;`;
-        link.textContent +=`${toggleableLayerIds}` ;
+            var link = document.createElement('a');
+            link.href = '#';
+            link.className = 'active';
+            link.innerHTML = `&#10004;`;
+            link.textContent += `${toggleableLayerIds}`;
 
-        link.onclick = function (e) {
-            var clickedLayer = toggleableLayerIds;
-            e.preventDefault();
-            e.stopPropagation();
+            link.onclick = function (e) {
+                var clickedLayer = toggleableLayerIds;
+                e.preventDefault();
+                e.stopPropagation();
 
-            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+                var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
 
-            if (visibility === 'visible') {
-                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-                this.className = '';
-            } else {
-                this.className = 'active';
-                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-            }
-        };
+                if (visibility === 'visible') {
+                    map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                    this.className = '';
+                } else {
+                    this.className = 'active';
+                    map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+                }
+            };
 
-        var layers = document.getElementById('layergroup');
-        layers.appendChild(link);
+            var layers = document.getElementById('layergroup');
+            layers.appendChild(link);
 
-        // When a click event occurs on a feature in the Train Layer layer, open a popup at the
-        // location of the feature, with description HTML from its properties.
-        var description = []
-        map.on('click', 'Train Layer', function (e) {
-            for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
-                var coordinates = e.features[0].geometry.coordinates.slice();
-                description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}<br>`;
-                // Ensure that if the map is zoomed out such that multiple
-                // copies of the feature are visible, the popup appears
-                // over the copy being pointed to.
-                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            // When a click event occurs on a feature in the Train Layer layer, open a popup at the
+            // location of the feature, with description HTML from its properties.
+            var description = []
+            map.on('click', 'Train Layer', function (e) {
+                for (var m = 0; m < Object.keys(e.features[0].properties).length; m++) {
+                    var coordinates = e.features[0].geometry.coordinates.slice();
+                    description[m] = `${Object.keys(e.features[0].properties)[m]}:${Object.values(e.features[0].properties)[m]}<br>`;
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appears
+                    // over the copy being pointed to.
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+
                 }
 
-            }
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
 
-            new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(description)
-                .addTo(map);
+            });
 
-        });
+            // Change the cursor to a pointer when the mouse is over the Train layer.
+            map.on('mouseenter', 'Train Layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
 
-        // Change the cursor to a pointer when the mouse is over the Train layer.
-        map.on('mouseenter', 'Train Layer', function () {
-            map.getCanvas().style.cursor = 'pointer';
-        });
+            // Change it back to a pointer when it leaves.
+            map.on('mouseleave', 'Train Layer', function () {
+                map.getCanvas().style.cursor = 'default';
+            });
 
-        // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'Train Layer', function () {
-            map.getCanvas().style.cursor = 'default';
-        });
+        }
 
-    }
-
-    else {
+        else {
+            toastr.options = {
+                "closeButton": false,
+                "timeOut": 7000,
+                "positionClass": "toast-top-right",
+                "showMethod": 'slideDown',
+                "hideMethod": 'slideUp',
+                "closeMethod": 'slideUp',
+            };
+            toastr.error(`<p  style="font-family: 'Patrick Hand', cursive;">Your Trainind Dataset does not contain any numeric variable.Try Another</p>`);
+            console.log("no numeric variable");
+        }
+    } else {
         toastr.options = {
             "closeButton": false,
             "timeOut": 7000,
@@ -197,8 +221,8 @@ function addTrainToMap(trainingGeojson) {
             "hideMethod": 'slideUp',
             "closeMethod": 'slideUp',
         };
-        toastr.error(`<p  style="font-family: 'Patrick Hand', cursive;">Your Trainind Dataset does not contain any numeric variable.Try Another</p>`);
-        console.log("no numeric variable");
+        toastr.error(`<p  style="font-family: 'Patrick Hand', cursive;">Please upload point data</p>`);
+        console.log("not point");
     }
 
 
@@ -239,8 +263,6 @@ function performTraining(trainingGeojson) {
     testButtonInput.addEventListener('change', handleForm);
     testButtonInput.addEventListener('change', function () {
         addTestData(variogram, selectedVariable)
-        $('.tap-target').tapTarget('open')
-        info.innerHTML = `<h5  style="font-family: 'Patrick Hand', cursive;">Good Job. Download your predictions.</h5>`
     })
 
 };
@@ -252,18 +274,35 @@ function addTestData(variogram, selectedVariable) {
     reader.onload = function () {
         var dataUrl = reader.result
         var testingGeojson = JSON.parse(dataUrl);
-        // Predict new data using generated variogram model 
-        performPrediction(testingGeojson, variogram, selectedVariable)
-        testButton.classList.add('disabled')
-        testButton.addEventListener('mouseenter', function () {
-            testButton.style.cursor = 'not-allowed'
-        })
+        if (testingGeojson.features[0].geometry.type == 'Point') {
+            // Predict new data using generated variogram model
+
+            performPrediction(testingGeojson, variogram, selectedVariable)
+            testButton.classList.add('disabled')
+            testButton.addEventListener('mouseenter', function () {
+                testButton.style.cursor = 'not-allowed'
+            })
+            $('.tap-target').tapTarget('open')
+            info.innerHTML = `<h5  style="font-family: 'Patrick Hand', cursive;">Good Job. Download your predictions.</h5>`
+        } else {
+            toastr.options = {
+                "closeButton": false,
+                "timeOut": 7000,
+                "positionClass": "toast-top-right",
+                "showMethod": 'slideDown',
+                "hideMethod": 'slideUp',
+                "closeMethod": 'slideUp',
+            };
+            toastr.error(`<p  style="font-family: 'Patrick Hand', cursive;">Please upload point data</p>`);
+            console.log("not point");
+        }
     }
     reader.readAsText(input.files[0]);
 
 
 }
 function performPrediction(testingGeojson, variogram, selectedVariable) {
+
     // predict new data 
     var predctions = []
     for (var i = 0; i < testingGeojson.features.length; i++) {
@@ -296,31 +335,31 @@ function performPrediction(testingGeojson, variogram, selectedVariable) {
     });
     var toggleableLayerIds = 'Predicted Layer'
 
-        var link = document.createElement('a');
-        link.href = '#';
-        link.className = 'active';
-        link.innerHTML = `&#10004;`;
-        link.textContent +=`${toggleableLayerIds}` ;
+    var link = document.createElement('a');
+    link.href = '#';
+    link.className = 'active';
+    link.innerHTML = `&#10004;`;
+    link.textContent += `${toggleableLayerIds}`;
 
 
-        link.onclick = function (e) {
-            var clickedLayer = toggleableLayerIds;
-            e.preventDefault();
-            e.stopPropagation();
+    link.onclick = function (e) {
+        var clickedLayer = toggleableLayerIds;
+        e.preventDefault();
+        e.stopPropagation();
 
-            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+        var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
 
-            if (visibility === 'visible') {
-                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-                this.className = '';
-            } else {
-                this.className = 'active';
-                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-            }
-        };
+        if (visibility === 'visible') {
+            map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            this.className = '';
+        } else {
+            this.className = 'active';
+            map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+        }
+    };
 
-        var layers = document.getElementById('layergroup');
-        layers.appendChild(link);
+    var layers = document.getElementById('layergroup');
+    layers.appendChild(link);
 
     testingGeojson.features.forEach(function (feature) {
         bounds.extend(feature.geometry.coordinates);
@@ -377,3 +416,5 @@ function downloadPredictions(content, filename) {
     }), file);
 }
 
+$('select').material_select();
+$("select[required]").css({ display: "block", height: 0, padding: 0, width: 0, position: 'absolute' });

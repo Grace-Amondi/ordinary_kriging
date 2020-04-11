@@ -55,8 +55,7 @@
                     <div class="card-content black-text">
                         <p>Ordinary Kriging is a spatial estimation method where the error variance is minimized.
                             This error variance is called the kriging variance.
-                            It is based on the configuration of the data and on the variogram, hence is is
-                            homoescedastic .
+                            It is based on the configuration of the data and on the variogram.
                         </p>
                     </div>
                     <div class="card-tabs ">
@@ -90,8 +89,8 @@
                         <div id="train">
                             <form id="trainForm">
                                 <div class="input-field">
-                                    <select id="variables" name="variable">
-                                        <option value="" disabled selected>Choose your variable</option>
+                                    <select id="variables" name="variable" required="true">
+                                        <option  disabled>Choose your variable</option>
                                         <!-- <option value="copper">Copper</option> -->
                                     </select>
                                     <label for="variables"
@@ -114,17 +113,17 @@
                                     <label for="test3">Spherical</label>
 
                                 </p>
-                                <label>Sigma value</label>
+                                <label>Sigma value</label><span class="badge orange black-text" id="sigmaBadge">5</span>
 
                                 <p class="range-field ">
 
-                                    <input name="range1" type="range" id="test9" min="0" max="10" />
+                                    <input name="sigma" type="range" id="sigma" min="0" max="10" />
                                 </p>
 
-                                <label>Alpha value</label>
+                                <label>Alpha value</label><span class="badge orange black-text" id="alphaBadge">5</span>
 
                                 <p class="range-field">
-                                    <input name="range2" type="range" id="test10" min="0" max="10" />
+                                    <input name="alpha" type="range" id="alpha" min="0" max="10" />
                                 </p>
                                 <input type="submit" class="btn waves-effect waves-light orange darken-1 pulse"
                                     value="Train Model" id="train_button">
